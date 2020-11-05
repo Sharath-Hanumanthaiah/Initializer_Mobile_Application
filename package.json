@@ -1,0 +1,48 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "npm run relay && expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "relay": "relay-compiler --schema schema.graphql --src ./Component/ --watchman true $@",
+    "devtools": "react-devtools"
+  },
+  "dependencies": {
+    "@eva-design/eva": "^2.0.0",
+    "@react-native-community/masked-view": "0.1.10",
+    "@react-navigation/bottom-tabs": "^5.9.1",
+    "@react-navigation/native": "^5.7.5",
+    "@react-navigation/stack": "^5.9.2",
+    "@ui-kitten/components": "^5.0.0",
+    "@ui-kitten/eva-icons": "^5.0.0",
+    "babel-plugin-relay": "^10.0.1",
+    "expo": "^38.0.10",
+    "expo-blur": "^8.2.0",
+    "expo-status-bar": "^1.0.2",
+    "graphql": "^15.3.0",
+    "react": "~16.11.0",
+    "react-dom": "~16.11.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",
+    "react-native-elements": "^2.3.2",
+    "react-native-gesture-handler": "~1.6.0",
+    "react-native-reanimated": "~1.9.0",
+    "react-native-safe-area-context": "~3.0.7",
+    "react-native-screens": "~2.9.0",
+    "react-native-snap-carousel": "^3.9.1",
+    "react-native-svg": "^12.1.0",
+    "react-native-timeline-flatlist": "^0.7.3",
+    "react-native-web": "~0.11.7",
+    "react-relay": "0.0.0-experimental-183bdd28",
+    "relay-hooks": "^3.7.0",
+    "relay-runtime": "^10.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "babel-preset-expo": "~8.1.0",
+    "react-devtools": "^4.8.2",
+    "relay-compiler": "^10.0.1"
+  },
+  "private": true
+}

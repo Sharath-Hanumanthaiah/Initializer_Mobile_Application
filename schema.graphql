@@ -1,0 +1,175 @@
+"""This directive allows results to be deferred during execution"""
+directive @defer on FIELD
+
+type Address {
+  firstLine: String
+  id: ID!
+  landMark: String
+  name: String
+  phoneNumber: String
+  pinCode: String
+  previousApiId: ID!
+  secondLine: String
+  userId: ID
+}
+
+type AddressConnection {
+  edges: [AddressConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type AddressConnectionEdge {
+  cursor: String
+  node: Address
+}
+
+scalar Date
+
+type HomePage {
+  content: [ItemCategory]
+  id: ID!
+  itemType: String!
+  name: String
+  previousApiId: ID!
+  typeId: ID!
+  widget: String!
+}
+
+type HomePageConnection {
+  edges: [HomePageConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type HomePageConnectionEdge {
+  cursor: String
+  node: HomePage
+}
+
+type ItemAvailability {
+  actualPrice: Float
+  available: String
+  discount: Long
+  discountPrice: Float
+  id: ID!
+  itemId: ID!
+  unit: String
+  value: Float
+}
+
+type ItemCategory {
+  description: String
+  id: ID!
+  imageLink: String
+  name: String
+  offer: String
+  previousApiId: String!
+}
+
+type ItemCategoryConnection {
+  edges: [ItemCategoryConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type ItemCategoryConnectionEdge {
+  cursor: String
+  node: ItemCategory
+}
+
+type ItemDetails {
+  categoryId: ID
+  id: ID!
+  imageLink: String
+  imageLinks: [String]
+  isWishlist: Boolean
+  itemAvailability: [ItemAvailability]
+  name: String
+  previousApiId: ID!
+  status: String
+  subCategoryId: ID
+}
+
+type ItemDetailsConnection {
+  edges: [ItemDetailsConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type ItemDetailsConnectionEdge {
+  cursor: String
+  node: ItemDetails
+}
+
+"""Long type"""
+scalar Long
+
+type OrderStatus {
+  confirmed: Boolean
+  delivered: Boolean
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Query {
+  getAddress(after: String, first: Int, userId: ID): AddressConnection
+  getHomePage(after: String, first: Int): HomePageConnection
+  getItemCategory(after: String, first: Int): ItemCategoryConnection
+  getItemCategoryContentById(after: String, categoryId: ID, first: Int): ItemCategoryConnection
+  getItemCategoryContentByIdTemp(categoryId: ID): [ItemCategory!]!
+  getUserById(id: ID!): UserDetails
+  getUserOrderById(orderId: ID!): UserOrderSet
+  getUserOrderSet(after: String, first: Int, userId: ID!): UserOrderSetConnection
+  getUserWishList(after: String, first: Int, userId: ID): ItemDetailsConnection
+}
+
+type UserDetails {
+  email: String
+  firstName: String
+  id: ID!
+  lastName: String
+  password: String
+  previousApiId: String!
+  status: String
+}
+
+type UserOrder {
+  amount: Float
+  availabilityId: ID
+  imageLink: String
+  itemId: ID!
+  itemName: String
+  quantity: ID
+  unit: String
+  userId: ID!
+}
+
+type UserOrderSet {
+  addressDetails: Address
+  addressId: ID
+  coupenCode: String
+  coupenDiscount: Float
+  deliveredBy: Date
+  deliveryCharge: Float
+  id: ID!
+  netAmount: Float
+  orderAt: Date
+  orderDetails: String
+  orderList: [UserOrder]
+  previousApiId: ID!
+  status: OrderStatus
+  totalAmount: Float
+}
+
+type UserOrderSetConnection {
+  edges: [UserOrderSetConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type UserOrderSetConnectionEdge {
+  cursor: String
+  node: UserOrderSet
+}
+
