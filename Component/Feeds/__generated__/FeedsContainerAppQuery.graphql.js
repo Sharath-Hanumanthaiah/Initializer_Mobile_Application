@@ -56,9 +56,13 @@ fragment Feeds_feed on Query {
 fragment RenderCard_item on HomePage {
   name
   widget
+  itemType
+  typeId
   content {
     id
+    previousApiId
     name
+    offer
     imageLink
   }
 }
@@ -99,6 +103,13 @@ v4 = {
   "args": null,
   "kind": "ScalarField",
   "name": "name",
+  "storageKey": null
+},
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "previousApiId",
   "storageKey": null
 };
 return {
@@ -162,13 +173,7 @@ return {
                     "storageKey": null
                   },
                   (v4/*: any*/),
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "previousApiId",
-                    "storageKey": null
-                  },
+                  (v5/*: any*/),
                   {
                     "alias": null,
                     "args": null,
@@ -186,13 +191,21 @@ return {
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "ItemCategory",
+                    "concreteType": "HomePageContent",
                     "kind": "LinkedField",
                     "name": "content",
                     "plural": true,
                     "selections": [
                       (v3/*: any*/),
+                      (v5/*: any*/),
                       (v4/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "offer",
+                        "storageKey": null
+                      },
                       {
                         "alias": null,
                         "args": null,
@@ -263,12 +276,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "23c39686afb18ea96d39983dce609285",
+    "cacheID": "908bdb074d3a6f60a3c8c43e61274ee3",
     "id": null,
     "metadata": {},
     "name": "FeedsContainerAppQuery",
     "operationKind": "query",
-    "text": "query FeedsContainerAppQuery(\n  $count: Int!\n  $after: String\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        previousApiId\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  content {\n    id\n    name\n    imageLink\n  }\n}\n"
+    "text": "query FeedsContainerAppQuery(\n  $count: Int!\n  $after: String\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        previousApiId\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  itemType\n  typeId\n  content {\n    id\n    previousApiId\n    name\n    offer\n    imageLink\n  }\n}\n"
   }
 };
 })();

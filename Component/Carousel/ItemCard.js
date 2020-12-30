@@ -1,26 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { ImageBackground } from "react-native";
 import { Card } from "@ui-kitten/components";
-import {  Text } from "@ui-kitten/components";
+import { Text } from "@ui-kitten/components";
 import ItemsHorizontalList from "./ItemsHorizontalList";
+import { ItemCardLoader } from "../Extras/Loaders";
+import ImageOverlay from "../Extras/ImageOverlay";
 
 export default function ItemCard(props) {
+  const { onItemPress, itemType } = props;
+  // let loading = false;
+  const [loading, setLoading] = useState(true);
 
-  const { onItemPress } = props;
-
-  const renderItemHeader = (image) => (
-    <ImageBackground style={styles.itemHeader} source={image} />
+  const renderItemHeader = (info) => (
+    <ImageOverlay
+      keyValue={"ItemCardImage" + info.index}
+      style={styles.itemHeader}
+      source={info.image}
+      type={"ItemCardLoader"}
+    />
   );
   const renderPostItem = ({ item }) => {
     return (
       <Card
         style={styles.productItem}
-        header={() => renderItemHeader({ uri: item.imageLink })}
-        onPress={() => onItemPress(item.id)}
+        header={() =>
+          renderItemHeader({
+            image: item.imageLink
+              ? { uri: item.imageLink }
+              : require("../../assets/product-default.png"),
+            index: item.id,
+          })
+        }
+        onPress={() =>
+          onItemPress({ itemType: itemType, typeId: item.previousApiId })
+        }
       >
         <View style={{ flexDirection: "column", margin: -10 }}>
-          <Text category="s1">{item.name}</Text>
+          <Text
+            category="s1"
+            style={{ fontWeight: "bold", alignSelf: "center" }}
+            numberOfLines={2}
+          >
+            {item.name}
+          </Text>
           <Text appearance="hint" category="c1" style={{ fontStyle: "italic" }}>
             {item.description}
           </Text>

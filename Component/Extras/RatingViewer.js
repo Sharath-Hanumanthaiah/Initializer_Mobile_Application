@@ -1,23 +1,18 @@
-import React from 'react';
-import {StyleSheet} from 'react-native';
-import {Text} from '@ui-kitten/components';
-import {TinyStar} from '../Extras/Icons';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { Text } from "@ui-kitten/components";
+import { TinyStar } from "../Extras/Icons";
 
 export default function RatingViewer(props) {
-    const {rating} = props;
-    return(
-        <>
+  const { rating } = props;
+  return (
+    <View style={{ flex: 1, flexDirection: "row" }}>
       <Text category="s2" style={styles.ratingText}>
         {rating}
       </Text>
-      {/* <MaterialCommunityIcons
-        name="star"
-        size={15}
-        style={styles.iconContainer}
-      /> */}
-        <TinyStar />
-    </>
-    )
+      <TinyStar />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -28,5 +23,5 @@ const styles = StyleSheet.create({
   iconContainer: {
     color: "white",
     marginHorizontal: 2,
-  }
+  },
 });

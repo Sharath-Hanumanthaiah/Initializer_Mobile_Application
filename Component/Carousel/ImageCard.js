@@ -9,8 +9,9 @@ export default function ImageCard(props) {
             return(
             <Card
             key={index}
-            style={{...styles.item, width:width/items.length}}
-            onPress={() => {}}>
+            style={{...styles.item, width:width/items.length}} 
+            // onPress={() => {}}
+            >
             {/* <Image source={item.image} style={styles.image}/> */}
             <Image source={{uri: item}} style={styles.image} />
           </Card> 

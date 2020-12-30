@@ -3,36 +3,48 @@ import { StyleSheet, View } from "react-native";
 import { Card, Text } from "@ui-kitten/components";
 import ImageOverlay from "../Extras/ImageOverlay";
 
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { AppColor } from "../Extras/Colors";
+import { OfferIcon } from "../Extras/Icons";
 
 export default function SingleCard(props) {
-  const {onItemPress, width} = props;
+  const { onItemPress, width, itemType } = props;
   return (
     <Card
       key={props.item.id}
-      style={{ ...styles.item, width: width }} 
-      onPress={() => onItemPress(index)}
+      style={{ ...styles.item, width: width }}
+      onPress={() => onItemPress({itemType: itemType, typeId: props.item.previousApiId})}
     >
-      <ImageOverlay style={styles.itemImage} source={{uri:props.item.imageLink}}>
+      <ImageOverlay
+        style={styles.itemImage}
+        keyValue={"image"+props.item.id}
+        source={
+          props.item.imageLink
+            ? { uri: props.item.imageLink }
+            : require("../../assets/product-default.png")
+        }
+      >
         <View style={styles.itemFooter}>
           <Text style={styles.itemTitle} category="h2" status="control">
             {props.item.name}
           </Text>
-          <View style={(styles.itemDescription, { flexDirection: "row" })}>
-            <MaterialCommunityIcons
-              name="brightness-percent"
-              size={20}
-              color="#f6673c"
-              style={{ marginLeft: 5 }}
-            />
-            <Text
-              style={{ marginLeft: 5, color: "#f6673c" }}
-              category="s1"
-              status="control"
-            >
-              {props.item.description}
-            </Text>
-          </View>
+          {props.item.offer ? (
+            <View style={(styles.itemDescription, { flexDirection: "row" })}>
+              <OfferIcon />
+              <Text
+                style={{
+                  marginLeft: 5,
+                  color: AppColor.White,
+                  fontWeight: "bold",
+                }}
+                category="s1"
+                status="control"
+              >
+                {`Offer upto ${props.item.offer} %`}
+              </Text>
+            </View>
+          ) : (
+            <></>
+          )}
         </View>
       </ImageOverlay>
     </Card>

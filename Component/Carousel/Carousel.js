@@ -2,9 +2,10 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { View, ScrollView, Text } from "react-native";
 import SingleCard from "./SingleCard";
+import ImageCard from "./ImageCard";
 
 export default function Carousel(props) {
-  const { onItemPress } = props;
+  const { onItemPress, itemType } = props;
   const itemsPerInterval =
     props.itemsPerInterval === undefined ? 1 : props.itemsPerInterval;
 
@@ -41,36 +42,41 @@ export default function Carousel(props) {
       </Text>
     );
   }
-    return (
-      <View>
-        <ScrollView
-          horizontal={true}
-          contentContainerStyle={{
-            ...styles.scrollView,
-            width: `${100 * intervals}%`,
-          }}
-          showsHorizontalScrollIndicator={false}
-          onContentSizeChange={(w, h) => init(w)}
-          onScroll={(data) => {
-            setWidth(data.nativeEvent.contentSize.width);
-            setInterval(getInterval(data.nativeEvent.contentOffset.x));
-          }}
-          scrollEventThrottle={200}
-          pagingEnabled
-          decelerationRate="fast"
-        >
-          {props.item.map((item) => (
+  return (
+    <View>
+      <ScrollView
+        horizontal={true}
+        contentContainerStyle={{
+          ...styles.scrollView,
+          width: `${100 * intervals}%`,
+        }}
+        showsHorizontalScrollIndicator={false}
+        onContentSizeChange={(w, h) => init(w)}
+        onScroll={(data) => {
+          setWidth(data.nativeEvent.contentSize.width);
+          setInterval(getInterval(data.nativeEvent.contentOffset.x));
+        }}
+        scrollEventThrottle={200}
+        pagingEnabled
+        decelerationRate="fast"
+      >
+        {props.style === "ImageCard" ? (
+          <ImageCard items={props.item} width={width} />
+        ) : (
+          props.item.map((item) => (
             <SingleCard
               key={item.id}
               item={item}
-              width={width/props.item.length}
+              itemType={itemType}
+              width={width / props.item.length}
               onItemPress={onItemPress}
             />
-          ))}
-        </ScrollView>
-        <View style={styles.bullets}>{bullets}</View>
-      </View>
-    );
+          ))
+        )}
+      </ScrollView>
+      <View style={styles.bullets}>{bullets}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -112,7 +118,7 @@ const styles = StyleSheet.create({
   bullet: {
     paddingHorizontal: 5,
     fontSize: 25,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   card: {
     flexBasis: "50%",

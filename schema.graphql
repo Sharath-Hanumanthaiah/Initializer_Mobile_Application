@@ -23,15 +23,35 @@ type AddressConnectionEdge {
   node: Address
 }
 
+input AddressInput {
+  firstLine: String
+  landMark: String
+  name: String!
+  phoneNumber: String!
+  pinCode: String
+  previousApiId: ID
+  secondLine: String
+  userId: ID!
+}
+
+type AddressOutput {
+  address: Address
+}
+
+type CompositeKey {
+  itemId: ID
+  userId: ID
+}
+
 scalar Date
 
 type HomePage {
-  content: [ItemCategory]
+  content: [HomePageContent]
   id: ID!
   itemType: String!
   name: String
   previousApiId: ID!
-  typeId: ID!
+  typeId: ID
   widget: String!
 }
 
@@ -43,6 +63,15 @@ type HomePageConnection {
 type HomePageConnectionEdge {
   cursor: String
   node: HomePage
+}
+
+type HomePageContent {
+  description: String
+  id: ID!
+  imageLink: String
+  name: String
+  offer: String
+  previousApiId: String!
 }
 
 type ItemAvailability {
@@ -75,8 +104,16 @@ type ItemCategoryConnectionEdge {
   node: ItemCategory
 }
 
+type ItemDescription {
+  disclaimer: String
+  itemProperties: String
+  sellerName: String
+}
+
 type ItemDetails {
+  averageRating: Float
   categoryId: ID
+  description: ItemDescription
   id: ID!
   imageLink: String
   imageLinks: [String]
@@ -98,8 +135,35 @@ type ItemDetailsConnectionEdge {
   node: ItemDetails
 }
 
+type ItemSubCategory {
+  categoryId: ID
+  description: String
+  id: ID!
+  imageLink: String
+  name: String
+  offer: String
+  previousApiId: String!
+}
+
+type ItemSubCategoryConnection {
+  edges: [ItemSubCategoryConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type ItemSubCategoryConnectionEdge {
+  cursor: String
+  node: ItemSubCategory
+}
+
 """Long type"""
 scalar Long
+
+type Mutation {
+  addItemReview(itemId: ID!, rating: Int, review: String, userId: ID!): UserReview
+  deleteAddress(id: ID!): Boolean
+  updateUser(input: UserDetailsInput!): UserDetailsOutput
+  upsertAddress(input: AddressInput!): AddressOutput
+}
 
 type OrderStatus {
   confirmed: Boolean
@@ -119,6 +183,10 @@ type Query {
   getItemCategory(after: String, first: Int): ItemCategoryConnection
   getItemCategoryContentById(after: String, categoryId: ID, first: Int): ItemCategoryConnection
   getItemCategoryContentByIdTemp(categoryId: ID): [ItemCategory!]!
+  getItemDetails(after: String, first: Int, itemType: String, typeId: ID): ItemDetailsConnection
+  getItemDetailsById(itemId: ID!, userId: ID!): ItemDetails
+  getItemReview(after: String, first: Int, itemId: ID!): UserReviewConnection
+  getItemSubCategoryByCategoryId(after: String, categoryId: ID, first: Int): ItemSubCategoryConnection
   getUserById(id: ID!): UserDetails
   getUserOrderById(orderId: ID!): UserOrderSet
   getUserOrderSet(after: String, first: Int, userId: ID!): UserOrderSetConnection
@@ -131,8 +199,19 @@ type UserDetails {
   id: ID!
   lastName: String
   password: String
-  previousApiId: String!
+  previousApiId: ID!
   status: String
+}
+
+input UserDetailsInput {
+  email: String
+  firstName: String
+  lastName: String
+  previousApiId: ID!
+}
+
+type UserDetailsOutput {
+  userDetails: UserDetails
 }
 
 type UserOrder {
@@ -171,5 +250,24 @@ type UserOrderSetConnection {
 type UserOrderSetConnectionEdge {
   cursor: String
   node: UserOrderSet
+}
+
+type UserReview {
+  changedAt: Date
+  id: String
+  previousApiId: CompositeKey
+  rating: Int
+  review: String
+  userName: String
+}
+
+type UserReviewConnection {
+  edges: [UserReviewConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type UserReviewConnectionEdge {
+  cursor: String
+  node: UserReview
 }
 

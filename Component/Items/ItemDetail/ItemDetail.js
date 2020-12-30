@@ -1,90 +1,50 @@
-import React, { useState } from 'react';
-import { ImageBackground, StyleSheet, Platform, View, ToastAndroid } from 'react-native';
-import {
-  Button,
-  Input,
-  Layout,
-  Card, 
-  Radio,
-  RadioGroup,
-  StyleService,
-  List,
-  Text,
-  Modal
-} from '@ui-kitten/components';
+import React, { useState } from "react";
+import { StyleSheet, View, ToastAndroid } from "react-native";
+import { Button, Layout, Card, List, Text } from "@ui-kitten/components";
 
-import RatingViewer from '../../Extras/RatingViewer';
+import RatingViewer from "../../Extras/RatingViewer";
 
-import {ButtonGroup} from 'react-native-elements';
+import { ButtonGroup } from "react-native-elements";
 
-import Carousel from '../../Carousel/Carousel';
+import Carousel from "../../Carousel/Carousel";
 
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {WishListIconActive, WishListIconInactive} from '../../Extras/Icons';
+import { WishListIconActive, WishListIconInactive } from "../../Extras/Icons";
 
-import CartAction from './CartAction';
-import CommentModel from './CommentModel';
+import { CartAction } from "./CartAction";
+import CommentModel from "./CommentModel";
 
-// const WishListIconActive = (props) => (
-//   <MaterialCommunityIcons name='heart' size={23} color='tomato'/>
-// )
-// const WishListIconInactive = (props) => (
-//   <MaterialCommunityIcons name='heart-outline' size={23} color='tomato'/>
-// )
-// const MinusIcon = () => (
-//   <MaterialCommunityIcons name='minus' size={23} color='tomato'/>
-// )
-// const PlusIcon = () => (
-//   <MaterialCommunityIcons name="plus" size={23} color="tomato" />
-// );
-const product = {
-  id: 5,
-  categoryId: 4,
-  subCategoryId: 3,
-  name: "sunfeast dark fantacy",
-  isFav: true,
-  itemAvailabilities: [
-    {
-      id: 12,
-      itemId: 5,
-      actualPrice: 80,
-      discount: 5,
-      discountPrice: 76,
-      value: 1,
-      unit: "PC",
-      available: "Y",
-    },
-    {
-      id: 14,
-      itemId: 5,
-      actualPrice: 240,
-      discount: 8,
-      discountPrice: 221,
-      value: 3,
-      unit: "PC",
-      available: "Y",
-    },
-  ],
-  description: {
-    itemProperties: "best for 3 months contains 30% protein",
-    sellerName: "nescafe",
-    disclaimer: "good for all age",
-  },
-  imageLinks: [
-    "http://res.cloudinary.com/dsywyhhdl/image/upload/v1586975422/psumsthbzigdqwpt4nsq.jpg",
-    "http://res.cloudinary.com/dsywyhhdl/image/upload/v1586975423/fw3pefisxrjpzw9lubrc.jpg",
-  ],
-  comments: ["hell", "o"],
-};
-export default function ItemDetail(props) {
-  // const [product, setProduct] = useState(data);
-  const [isWishlist, setIsWishList] = useState(product.isFav);
+import { createPaginationContainer, graphql } from "react-relay";
+
+function _loadMore(props) {
+  console.log(
+    "starting loading more",
+    props.relay.hasMore(),
+    props.relay.isLoading()
+  );
+  if (!props.relay.hasMore() || props.relay.isLoading()) {
+    return;
+  }
+  console.log("loading more");
+  props.relay.loadMore(
+    5, // Fetch the next 10 feed items
+    (error) => {
+      console.log(error);
+    }
+  );
+}
+function ItemDetail(props) {
+  const [isWishlist, setIsWishList] = useState(
+    props.item.getItemDetailsById.isWishlist
+  );
   const [quantity, setQuantity] = useState(1);
   const [ModelVisible, setModelVisible] = React.useState(false);
-  const availabilityData = product.itemAvailabilities === undefined? [{}]: product.itemAvailabilities;
-  
+  const availabilityData =
+    props.item.getItemDetailsById.itemAvailability === undefined
+      ? [{}]
+      : props.item.getItemDetailsById.itemAvailability;
+
   const [availabilityIndex, setAvailabilityIndex] = useState(0);
-  
+
   const [comment, setComment] = React.useState("");
 
   const updateIndex = (selectedIndex) => {
@@ -101,31 +61,63 @@ export default function ItemDetail(props) {
     //   navigation && navigation.navigate('ShoppingCart');
   };
   const addToWishList = (props) => {
-    let messageContext = isWishlist?'removed from':'added to';
+    let messageContext = isWishlist ? "removed from" : "added to";
     setIsWishList(!isWishlist);
-    ToastAndroid.show(`${messageContext} your wishlist`, ToastAndroid.SHORT, ToastAndroid.CENTER);
-}
+    ToastAndroid.show(
+      `${messageContext} your wishlist`,
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER
+    );
+  };
   const buttons = availabilityData.map((e) => {
-    return(`${e.value} ${e.unit}`) 
-  }) 
-  const renderHeader = () => (
+    return `${e.value} ${e.unit}`;
+  });
+  const renderCommentHeader = (comment) => (
+    <View style={styles.commentHeader}>
+      <View style={styles.commentAuthorContainer}>
+        <Text category="s2">{comment.userName}</Text>
+        <Text appearance="hint" category="c1">
+          {comment.changedAt}
+        </Text>
+      </View>
+      <View style={styles.ratingContainerComment}>
+        <RatingViewer rating={comment.rating} />
+      </View>
+    </View>
+  );
+  const renderComment = ({ item }) => (
+    <Card
+      disabled={true}
+      style={styles.commentItem}
+      header={() => renderCommentHeader(item.node)}
+    >
+      <Text>{item.node.review}</Text>
+    </Card>
+  );
+  const renderheader = (info) => (
     <Layout style={styles.header}>
       <Carousel
         style={"ImageCard"}
         itemsPerInterval={1}
-        items={product.imageLinks}
+        item={info.imageLinks ? info.imageLinks : []}
       ></Carousel>
       <Layout style={styles.detailsContainer} level="1">
         <Text category="h5" style={styles.title}>
-          {product.name}
+          {info.name}
         </Text>
         <Text category="s1" style={styles.discount}>
-        {availabilityData[availabilityIndex].discount?
-                 `${availabilityData[availabilityIndex].discount} % off`: ''} 
+          {availabilityData[availabilityIndex] &&
+          availabilityData[availabilityIndex].discount
+            ? `${availabilityData[availabilityIndex].discount} % off`
+            : ""}
         </Text>
-        <View style={styles.ratingContainer}>
-          <RatingViewer rating={4.5} />
-        </View>
+        {info.averageRating ? (
+          <View style={styles.ratingContainer}>
+            <RatingViewer rating={info.averageRating} />
+          </View>
+        ) : (
+          <></>
+        )}
         <Text style={styles.secondHeading} category="s1">
           Available In
         </Text>
@@ -144,41 +136,49 @@ export default function ItemDetail(props) {
           style={styles.wishlistButton}
           appearance="ghost"
           status="basic"
-          accessoryLeft={isWishlist?WishListIconActive:WishListIconInactive}
+          accessoryLeft={isWishlist ? WishListIconActive : WishListIconInactive}
           onPress={addToWishList}
         />
-        <View style={{ marginTop: 8 }}>
-          <View style={{ display: "flex", flexDirection: "column" }}>
-            <View style={styles.secondContainer}>
-              <Text category="s1" appearance="hint">
-                {"Product MRP : "}
-              </Text>
-              <Text style={styles.actualPrice} category="s1" appearance="hint">
-              {`₹ ${availabilityData[availabilityIndex].actualPrice}`}
-              </Text>
-            </View>
-            <View style={styles.secondContainer}>
-              <Text category="s1" style={styles.amountText}>
-                {"Selling Price : "}
-              </Text>
-              <Text style={styles.discountPrice} category="h6">
-              {`₹ ${availabilityData[availabilityIndex].discountPrice}`}
-              </Text>
+        {availabilityData[availabilityIndex] ? (
+          <View style={{ marginTop: 8 }}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
+              <View style={styles.secondContainer}>
+                <Text category="s1" appearance="hint">
+                  {"Product MRP : "}
+                </Text>
+                <Text
+                  style={styles.actualPrice}
+                  category="s1"
+                  appearance="hint"
+                >
+                  {`₹ ${availabilityData[availabilityIndex].actualPrice}`}
+                </Text>
+              </View>
+              <View style={styles.secondContainer}>
+                <Text category="s1" style={styles.amountText}>
+                  {"Selling Price : "}
+                </Text>
+                <Text style={styles.discountPrice} category="h6">
+                  {`₹ ${availabilityData[availabilityIndex].discountPrice}`}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <></>
+        )}
         <Text style={styles.secondHeading} category="s1">
           Product Information
         </Text>
         <View style={{ display: "flex", flexDirection: "column" }}>
           <Text category="s1" style={styles.secondContainer}>
-            {`Specifications : ${product.description['itemProperties']}`}
+            {`Specifications : ${info.description["itemProperties"]}`}
           </Text>
           <Text category="s1" style={styles.secondContainer}>
-            {`Manufacturer Details : ${product.description['sellerName']}`}
+            {`Manufacturer Details : ${info.description["sellerName"]}`}
           </Text>
           <Text category="s1" style={styles.secondContainer}>
-            {`disclaimer : ${product.description['disclaimer']}`}
+            {`disclaimer : ${info.description["disclaimer"]}`}
           </Text>
         </View>
         <View style={{ display: "flex", flexDirection: "row", marginTop: 16 }}>
@@ -188,46 +188,18 @@ export default function ItemDetail(props) {
           >
             Ratings and Review
           </Text>
-          <Button
-            size="small"
-            activeOpacity={0.8}
-            style={styles.ratingButton}
-            onPress={openCommentModel}
-          >
-            Rate Product
-          </Button>
         </View>
       </Layout>
     </Layout>
   );
-  const renderCommentHeader = (comment) => (
-    <View style={styles.commentHeader}>
-      <View style={styles.commentAuthorContainer}>
-        <Text category="s2">Karthik H</Text>
-        <Text appearance="hint" category="c1">
-          20-Aug-2020
-        </Text>
-      </View>
-      <View style={styles.ratingContainerComment}>
-        <RatingViewer rating={4.5} />
-      </View>
-    </View>
-  );
-  const renderComment = (info) => (
-    <Card
-      disabled={true}
-      style={styles.commentItem}
-      header={() => renderCommentHeader(info.item)}
-    >
-      <Text>Nice Product Worth buying it</Text>
-    </Card>
-  );
   return (
     <View style={styles.container}>
       <List
-        ListHeaderComponent={renderHeader}
+        data={props.comment.getItemReview.edges}
         renderItem={renderComment}
-        data={product.comments}
+        ListHeaderComponent={renderheader(props.item.getItemDetailsById)}
+        onEndReachedThreshold={0.5}
+        onEndReached={() => _loadMore(props)}
       />
       <CartAction quantity={quantity} setQuantity={setQuantity} />
       <CommentModel
@@ -237,6 +209,86 @@ export default function ItemDetail(props) {
     </View>
   );
 }
+
+module.exports = createPaginationContainer(
+  ItemDetail,
+  {
+    comment: graphql`
+      fragment ItemDetail_comment on Query {
+        getItemReview(first: $count, after: $after, itemId: $itemId)
+          @connection(key: "CommentModel_getItemReview") {
+          edges {
+            cursor
+            node {
+              id
+              userName
+              rating
+              review
+              changedAt
+            }
+          }
+        }
+      }
+    `,
+    item: graphql`
+      # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
+      fragment ItemDetail_item on Query {
+        getItemDetailsById(itemId: $itemId, userId: $userId) {
+          id
+          previousApiId
+          name
+          itemAvailability {
+            id
+            actualPrice
+            discount
+            discountPrice
+            value
+            unit
+          }
+          description {
+            itemProperties
+            sellerName
+            disclaimer
+          }
+          imageLinks
+          isWishlist
+          averageRating
+        }
+      }
+    `,
+  },
+  {
+    direction: "forward",
+    getConnectionFromProps(props) {
+      return props.review && props.review.getItemReview;
+    },
+    // This is also the default implementation of `getFragmentVariables` if it isn't provided.
+    getFragmentVariables(prevVars, totalCount) {
+      return {
+        ...prevVars,
+        count: totalCount,
+      };
+    },
+    getVariables(props, { count, cursor }, fragmentVariables) {
+      console.log("getVariable", fragmentVariables, "prop", props);
+      return {
+        count: count,
+        after: props.address.getAddress.pageInfo.endCursor,
+        itemId: fragmentVariables.itemId,
+        cursor,
+        // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
+        // userID: fragmentVariables.userID,
+      };
+    },
+    query: graphql`
+      # Pagination query to be fetched upon calling 'loadMore'.
+      # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
+      query ItemDetailQuery($count: Int!, $after: String, $itemId: ID!) {
+        ...ItemDetail_comment
+      }
+    `,
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -250,7 +302,7 @@ const styles = StyleSheet.create({
   image: {
     width: 120,
     height: 144,
-    alignSelf: 'flex-start'
+    alignSelf: "flex-start",
   },
   buttonGroupTextStyle: {
     fontSize: 13,

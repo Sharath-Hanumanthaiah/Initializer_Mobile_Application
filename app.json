@@ -1,14 +1,23 @@
 {
   "expo": {
-    "name": "Mart",
+    "name": "Shopping Mart",
     "slug": "Mart",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "android" : {
+      "package": "com.initializers.shoppingmart",
+      "enableDangerousExperimentalLeanBuilds": true,
+      "versionCode": 1,
+      "splash": {
+        "ldpi": "./assets/image/drawable-ldpi/splash.png",
+        "mdpi": "./assets/image/drawable-mdpi/splash.png",
+        "hdpi": "./assets/image/drawable-hdpi/splash.png",
+        "xhdpi": "./assets/image/drawable-xhdpi/splash.png",
+        "xxhdpi": "./assets/image/drawable-xxhdpi/splash.png",
+        "xxxhdpi": "./assets/image/drawable-xxxhdpi/splash.png",
+        "resizeMode": "cover"
+      }
     },
     "updates": {
       "fallbackToCacheTimeout": 0

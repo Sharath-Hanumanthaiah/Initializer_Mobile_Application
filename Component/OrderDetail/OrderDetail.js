@@ -1,59 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  ImageBackground,
   StyleSheet,
-  Platform,
   View,
-  ToastAndroid,
   Image,
 } from "react-native";
 import {
   Button,
-  Input,
   Layout,
   Card,
-  Radio,
-  RadioGroup,
-  StyleService,
   List,
   Text,
-  Modal,
   Divider,
 } from "@ui-kitten/components";
 
 import Timeline from "react-native-timeline-flatlist";
-
-import RatingViewer from "../Extras/RatingViewer";
-
-import { ButtonGroup } from "react-native-elements";
-
-import Carousel from "../Carousel/Carousel";
-
-import { WishListIconActive, WishListIconInactive } from "../Extras/Icons";
-
-import CartAction from "../Items/ItemDetail/CartAction";
 import CommentModel from "../Items/ItemDetail/CommentModel";
-import symbolicateStackTrace from "react-native/Libraries/Core/Devtools/symbolicateStackTrace";
+import {HomePageLoader} from '../Extras/Loaders';
 
 import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 import { QueryRenderer, graphql } from "react-relay";
 
-const timelineData = [
-  {
-    time: "20th July 2020",
-    title: "Confirmed",
-    description: " ",
-    lineColor: "#388e3c",
-    circleColor: "#388e3c",
-  },
-  {
-    time: "21st July 2020",
-    title: "Delivered",
-    description: " ",
-    lineColor: "#808080",
-    circleColor: "#808080",
-  },
-];
 
 const generateTimelineData = (data) => {
   return [
@@ -71,85 +37,14 @@ const generateTimelineData = (data) => {
     },
   ];
 };
-const product = {
-  id: 5,
-  categoryId: 4,
-  subCategoryId: 3,
-  name: "sunfeast dark fantacy",
-  isFav: true,
-  itemAvailabilities: [
-    {
-      id: 12,
-      itemId: 5,
-      actualPrice: 80,
-      discount: 5,
-      discountPrice: 76,
-      value: 1,
-      unit: "PC",
-      available: "Y",
-    },
-    {
-      id: 14,
-      itemId: 5,
-      actualPrice: 240,
-      discount: 8,
-      discountPrice: 221,
-      value: 3,
-      unit: "PC",
-      available: "Y",
-    },
-  ],
-  description: {
-    itemProperties: "best for 3 months contains 30% protein",
-    sellerName: "nescafe",
-    disclaimer: "good for all age",
-  },
-  imageLinks: [
-    "http://res.cloudinary.com/dsywyhhdl/image/upload/v1586975422/psumsthbzigdqwpt4nsq.jpg",
-    "http://res.cloudinary.com/dsywyhhdl/image/upload/v1586975423/fw3pefisxrjpzw9lubrc.jpg",
-  ],
-  comments: ["hell", "o"],
-};
 export default function OrderDetail({ route }, props) {
   // const [product, setProduct] = useState(data);
   const { orderId } = route.params;
-  const [isWishlist, setIsWishList] = useState(product.isFav);
-  const [quantity, setQuantity] = useState(1);
   const [ModelVisible, setModelVisible] = React.useState(false);
-  const availabilityData =
-    product.itemAvailabilities === undefined
-      ? [{}]
-      : product.itemAvailabilities;
 
-  const [availabilityIndex, setAvailabilityIndex] = useState(0);
-
-  const [comment, setComment] = React.useState("");
-
-  const updateIndex = (selectedIndex) => {
-    setAvailabilityIndex(selectedIndex);
-  };
-
-  const onBuyButtonPress = () => {
-    //   navigation && navigation.navigate('Payment');
-  };
   const openCommentModel = () => {
     setModelVisible(true);
   };
-  const onAddButtonPress = () => {
-    //   navigation && navigation.navigate('ShoppingCart');
-  };
-  const addToWishList = (props) => {
-    let messageContext = isWishlist ? "removed from" : "added to";
-    setIsWishList(!isWishlist);
-    ToastAndroid.show(
-      `${messageContext} your wishlist`,
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
-    );
-  };
-  const buttons = availabilityData.map((e) => {
-    return `${e.value} ${e.unit}`;
-  });
   const renderHeader = (info) => {
     return (
       <Layout style={styles.header}>
@@ -394,7 +289,7 @@ export default function OrderDetail({ route }, props) {
           return <Text>Error!</Text>;
         }
         if (!props) {
-          return <Text>Loading...</Text>;
+          return <HomePageLoader />;
         }
         return (
           <>

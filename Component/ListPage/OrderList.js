@@ -1,28 +1,28 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import {
-  List,
-  ListItem,
-  Text,
-  Icon,
-} from "@ui-kitten/components";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { List, ListItem, Text, Icon } from "@ui-kitten/components";
 import { AppColor } from "../Extras/Colors";
-import {createPaginationContainer, graphql} from 'react-relay';
-
+import { createPaginationContainer, graphql } from "react-relay";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
+import { PaginationLoader } from "../Extras/Loaders";
+
 function _loadMore(props) {
-  console.log("starting loading more", props.relay.hasMore(), props.relay.isLoading());
+  console.log(
+    "starting loading more",
+    props.relay.hasMore(),
+    props.relay.isLoading()
+  );
   if (!props.relay.hasMore() || props.relay.isLoading()) {
     return;
   }
   console.log("loading more");
   props.relay.loadMore(
-    5,  // Fetch the next 10 feed items
-    error => {
+    5, // Fetch the next 10 feed items
+    (error) => {
       console.log(error);
-    },
+    }
   );
 }
 
@@ -36,14 +36,7 @@ export default function OrderList(props) {
     onAddWishList,
     ...listItemProps
   } = props;
-  // const [availabilityData, setAvailabilityData] = useState(product.availablity);
   const zoomIconRef = React.useRef();
-  // availabilityData =
-  //   product.availablity === undefined ? [{}] : product.availablity;
-  // const [availabilityIndex, setAvailabilityIndex] = useState(0);
-  // const buttons = availabilityData.map((e) => {
-  //   return `${e.value} ${e.unit}`;
-  // });
   const renderProductItem = (product) => {
     const productDetails = product.item.node;
     return (
@@ -52,7 +45,9 @@ export default function OrderList(props) {
           {...listItemProps}
           style={[styles.container, style]}
           key={productDetails.previousApiId}
-          onPress={() => {onItemClick(productDetails.previousApiId)}}
+          onPress={() => {
+            onItemClick(productDetails.previousApiId);
+          }}
         >
           <View style={styles.detailsContainer}>
             <View style={{ width: "90%" }}>
@@ -79,7 +74,10 @@ export default function OrderList(props) {
                     color="tomato"
                     style={{ marginVertical: 4, marginRight: 10 }}
                   />
-                  <Text category="s1">{`Delivered By : `+ new Date(productDetails.deliveredBy).toDateString()}</Text>
+                  <Text category="s1">
+                    {`Delivered By : ` +
+                      new Date(productDetails.deliveredBy).toDateString()}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -111,8 +109,22 @@ export default function OrderList(props) {
     zoomIconRef.current.startAnimation();
     onItemClick(e);
   };
-  return <List data={props.orders.getUserOrderSet.edges} renderItem={renderProductItem} onEndReachedThreshold={0.5}
-  onEndReached={() => _loadMore(props)} />;
+  const renderFooter = () => {
+    if (props.relay.hasMore()) {
+      return <PaginationLoader />;
+    } else {
+      return <></>;
+    }
+  };
+  return (
+    <List
+      data={props.orders.getUserOrderSet.edges}
+      renderItem={renderProductItem}
+      onEndReachedThreshold={0.5}
+      onEndReached={() => _loadMore(props)}
+      ListFooterComponent={renderFooter}
+    />
+  );
 }
 
 module.exports = createPaginationContainer(

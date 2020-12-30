@@ -38,6 +38,7 @@ fragment AddressList_address on Query {
     edges {
       node {
         id
+        previousApiId
         name
         firstLine
         secondLine
@@ -154,6 +155,13 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
+                    "name": "previousApiId",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
                     "name": "name",
                     "storageKey": null
                   },
@@ -243,9 +251,7 @@ return {
       {
         "alias": null,
         "args": (v3/*: any*/),
-        "filters": [
-          "userId"
-        ],
+        "filters": [],
         "handle": "connection",
         "key": "AddressList_getAddress",
         "kind": "LinkedHandle",
@@ -254,12 +260,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5392fd8563ff785edd3d2b7d2b769db7",
+    "cacheID": "ab7b59c8b1a944276ab911ffc8e50d89",
     "id": null,
     "metadata": {},
     "name": "AddressListQuery",
     "operationKind": "query",
-    "text": "query AddressListQuery(\n  $count: Int!\n  $after: String\n  $userID: ID!\n) {\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query AddressListQuery(\n  $count: Int!\n  $after: String\n  $userID: ID!\n) {\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        previousApiId\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

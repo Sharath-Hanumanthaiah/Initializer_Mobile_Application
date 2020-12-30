@@ -33,7 +33,7 @@ query WishlistQuery(
   ...Wishlist_wishlist
 }
 
-fragment ItemList_item on ItemDetails {
+fragment ItemListItem_item on ItemDetails {
   id
   previousApiId
   name
@@ -55,7 +55,7 @@ fragment Wishlist_wishlist on Query {
       cursor
       node {
         id
-        ...ItemList_item
+        ...ItemListItem_item
         __typename
       }
     }
@@ -299,12 +299,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a21fff4b4f7406f2493cc7e343844923",
+    "cacheID": "a8c0dfa9c2e2b2e81ae69e6bac8a9931",
     "id": null,
     "metadata": {},
     "name": "WishlistQuery",
     "operationKind": "query",
-    "text": "query WishlistQuery(\n  $count: Int!\n  $after: String\n  $userId: ID!\n) {\n  ...Wishlist_wishlist\n}\n\nfragment ItemList_item on ItemDetails {\n  id\n  previousApiId\n  name\n  imageLink\n  isWishlist\n  itemAvailability {\n    actualPrice\n    discount\n    discountPrice\n    value\n    unit\n    id\n  }\n}\n\nfragment Wishlist_wishlist on Query {\n  getUserWishList(first: $count, after: $after, userId: $userId) {\n    edges {\n      cursor\n      node {\n        id\n        ...ItemList_item\n        __typename\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n"
+    "text": "query WishlistQuery(\n  $count: Int!\n  $after: String\n  $userId: ID!\n) {\n  ...Wishlist_wishlist\n}\n\nfragment ItemListItem_item on ItemDetails {\n  id\n  previousApiId\n  name\n  imageLink\n  isWishlist\n  itemAvailability {\n    actualPrice\n    discount\n    discountPrice\n    value\n    unit\n    id\n  }\n}\n\nfragment Wishlist_wishlist on Query {\n  getUserWishList(first: $count, after: $after, userId: $userId) {\n    edges {\n      cursor\n      node {\n        id\n        ...ItemListItem_item\n        __typename\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();

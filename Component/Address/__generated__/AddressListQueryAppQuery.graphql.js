@@ -9,29 +9,27 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type AddressList_address$ref = any;
-type UserProfileHeader_user$ref = any;
-export type UserProfileAppQueryVariables = {|
+export type AddressListQueryAppQueryVariables = {|
   userID: string,
   count: number,
   after?: ?string,
 |};
-export type UserProfileAppQueryResponse = {|
-  +$fragmentRefs: UserProfileHeader_user$ref & AddressList_address$ref
+export type AddressListQueryAppQueryResponse = {|
+  +$fragmentRefs: AddressList_address$ref
 |};
-export type UserProfileAppQuery = {|
-  variables: UserProfileAppQueryVariables,
-  response: UserProfileAppQueryResponse,
+export type AddressListQueryAppQuery = {|
+  variables: AddressListQueryAppQueryVariables,
+  response: AddressListQueryAppQueryResponse,
 |};
 */
 
 
 /*
-query UserProfileAppQuery(
+query AddressListQueryAppQuery(
   $userID: ID!
   $count: Int!
   $after: String
 ) {
-  ...UserProfileHeader_user
   ...AddressList_address
 }
 
@@ -40,6 +38,7 @@ fragment AddressList_address on Query {
     edges {
       node {
         id
+        previousApiId
         name
         firstLine
         secondLine
@@ -54,14 +53,6 @@ fragment AddressList_address on Query {
       endCursor
       hasNextPage
     }
-  }
-}
-
-fragment UserProfileHeader_user on Query {
-  getUserById(id: $userID) {
-    id
-    firstName
-    email
   }
 }
 */
@@ -82,14 +73,7 @@ v2 = {
   "kind": "LocalArgument",
   "name": "userID"
 },
-v3 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v4 = [
+v3 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -115,13 +99,8 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "UserProfileAppQuery",
+    "name": "AddressListQueryAppQuery",
     "selections": [
-      {
-        "args": null,
-        "kind": "FragmentSpread",
-        "name": "UserProfileHeader_user"
-      },
       {
         "args": null,
         "kind": "FragmentSpread",
@@ -139,43 +118,11 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "UserProfileAppQuery",
+    "name": "AddressListQueryAppQuery",
     "selections": [
       {
         "alias": null,
-        "args": [
-          {
-            "kind": "Variable",
-            "name": "id",
-            "variableName": "userID"
-          }
-        ],
-        "concreteType": "UserDetails",
-        "kind": "LinkedField",
-        "name": "getUserById",
-        "plural": false,
-        "selections": [
-          (v3/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "firstName",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "email",
-            "storageKey": null
-          }
-        ],
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": (v4/*: any*/),
+        "args": (v3/*: any*/),
         "concreteType": "AddressConnection",
         "kind": "LinkedField",
         "name": "getAddress",
@@ -197,7 +144,20 @@ return {
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  (v3/*: any*/),
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "id",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "previousApiId",
+                    "storageKey": null
+                  },
                   {
                     "alias": null,
                     "args": null,
@@ -290,10 +250,8 @@ return {
       },
       {
         "alias": null,
-        "args": (v4/*: any*/),
-        "filters": [
-          "userId"
-        ],
+        "args": (v3/*: any*/),
+        "filters": [],
         "handle": "connection",
         "key": "AddressList_getAddress",
         "kind": "LinkedHandle",
@@ -302,16 +260,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "6f9b6a924fa7631e66b4d7258b1fdecb",
+    "cacheID": "3af200b8cf2e4aed4c74350ecbaae485",
     "id": null,
     "metadata": {},
-    "name": "UserProfileAppQuery",
+    "name": "AddressListQueryAppQuery",
     "operationKind": "query",
-    "text": "query UserProfileAppQuery(\n  $userID: ID!\n  $count: Int!\n  $after: String\n) {\n  ...UserProfileHeader_user\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment UserProfileHeader_user on Query {\n  getUserById(id: $userID) {\n    id\n    firstName\n    email\n  }\n}\n"
+    "text": "query AddressListQueryAppQuery(\n  $userID: ID!\n  $count: Int!\n  $after: String\n) {\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        previousApiId\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'e2a1426ae58360ca96b0aeb34567d874';
+(node/*: any*/).hash = '5cb362c83f838e31448d4f54f3c06211';
 
 module.exports = node;

@@ -5,13 +5,14 @@ import { Card, List, Text, Divider } from "@ui-kitten/components";
 import { createPaginationContainer, graphql } from "react-relay";
 
 import RenderCard from "../Carousel/RenderCard";
+import { PaginationLoader } from "../Extras/Loaders";
 
 function _loadMore(props) {
   if (!props.relay.hasMore() || props.relay.isLoading()) {
     return;
   }
   props.relay.loadMore(
-    5, // Fetch the next 5 feed items
+    4, // Fetch the next 5 feed items
     (error) => {
       console.log(error);
     }
@@ -20,17 +21,28 @@ function _loadMore(props) {
 
 export default function Feeds(props) {
   const onItemPress = (event) => {
-    props.navigation.navigate("ItemList");
+    if (event.itemType === "ItemDetails") {
+      props.navigation.navigate("ItemList", {
+        screen: "Details",
+        params: { typeId: event.typeId },
+      });
+    } else {
+      props.navigation.navigate("ItemList", {
+        screen: "ItemList",
+        params: { itemType: event.itemType, typeId: event.typeId },
+      });
+    }
   };
   const renderItem = ({ item }) => {
-    return(
-      <RenderCard 
-      item={item.node}
-      onItemPress={onItemPress}
-    />
-    );
+    return <RenderCard item={item.node} onItemPress={onItemPress} />;
   };
-
+  const renderFooter = () => {
+    if (props.relay.hasMore()) {
+      return <PaginationLoader />;
+    } else {
+      return <></>;
+    }
+  };
   return (
     <List
       style={styles.container}
@@ -39,6 +51,7 @@ export default function Feeds(props) {
       renderItem={renderItem}
       onEndReachedThreshold={0.5}
       onEndReached={() => _loadMore(props)}
+      ListFooterComponent={renderFooter}
     />
   );
 }

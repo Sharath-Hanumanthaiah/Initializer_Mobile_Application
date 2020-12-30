@@ -8,7 +8,7 @@
 
 /*::
 import type { ReaderFragment } from 'relay-runtime';
-type ItemList_item$ref = any;
+type ItemListItem_item$ref = any;
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type Wishlist_wishlist$ref: FragmentReference;
 declare export opaque type Wishlist_wishlist$fragmentType: Wishlist_wishlist$ref;
@@ -18,7 +18,7 @@ export type Wishlist_wishlist = {|
       +cursor: ?string,
       +node: ?{|
         +id: string,
-        +$fragmentRefs: ItemList_item$ref,
+        +$fragmentRefs: ItemListItem_item$ref,
       |},
     |}>,
     +pageInfo: ?{|
@@ -121,7 +121,7 @@ const node/*: ReaderFragment*/ = {
                 {
                   "args": null,
                   "kind": "FragmentSpread",
-                  "name": "ItemList_item"
+                  "name": "ItemListItem_item"
                 }
               ],
               "storageKey": null
@@ -162,6 +162,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = 'd4d84ab27f9425a70339f5d61537c6f9';
+(node/*: any*/).hash = 'a95119d182557c162a08eb8dd875e4d3';
 
 module.exports = node;

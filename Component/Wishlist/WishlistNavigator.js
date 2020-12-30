@@ -5,6 +5,7 @@ import { AppColor } from "../Extras/Colors";
 import Header from "../Header/Header";
 import HeaderRight from "../Header/HeaderRight";
 import WishlistQuery from './WishlistQuery';
+import ItemDetailsQuery from '../Items/ItemDetail/ItemDetailsQuery'
 const WishlistStack = createStackNavigator();
 
 export default function WishListNavigator() {
@@ -19,6 +20,7 @@ export default function WishListNavigator() {
         }}
       >
         <WishlistStack.Screen name="Profile" component={WishlistQuery} />
+        <WishlistStack.Screen name="Details" component={ItemDetailsQuery} />
       </WishlistStack.Navigator>
     );
   }

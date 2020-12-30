@@ -1,9 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as SplashScreen from 'expo-splash-screen';
 
 import WishlistNavigator from '../Wishlist/WishlistNavigator';
-import Cart from '../Cart/Cart';
-import UserProfile from '../UserProfile/UserProfile';
+import CartNavigator from '../Cart/CartNavigator';
+import UserProfileNavigator from '../UserProfile/UserProfileNavigator';
 import OrderNavigator from '../Order/OrderNavigator';
 import FeedsNavigator from '../Feeds/FeedsNavigator';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,6 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Tab = createBottomTabNavigator();
 export default function Home({route, navigation}) {
   const { AppColor } = route.params;
+  SplashScreen.hideAsync();
     return(
     <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -42,9 +44,9 @@ export default function Home({route, navigation}) {
         <Tab.Screen name="Feeds" component={FeedsNavigator} options={{title: "Home"}} 
         initialParams={{AppColor: AppColor}}/>
         <Tab.Screen name="WishList" component={WishlistNavigator} options={{title: "WishList"}}/>
-        <Tab.Screen name="Cart" component={Cart} options={{title: "Cart"}}/>
+        <Tab.Screen name="Cart" component={CartNavigator} options={{title: "Cart"}}/>
         <Tab.Screen name="Order" component={OrderNavigator} options={{title: "Order"}}/>
-        <Tab.Screen name="UserProfile" component={UserProfile} options={{title: "Profile"}}/>
+        <Tab.Screen name="UserProfile" component={UserProfileNavigator} options={{title: "Profile"}}/>
         
     </Tab.Navigator>
     );

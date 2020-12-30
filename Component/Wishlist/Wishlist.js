@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, ToastAndroid } from "react-native";
-import { Layout, List, Text, Divider } from "@ui-kitten/components";
-import ItemList from "../ListPage/ItemList";
+import { Layout, List, Divider } from "@ui-kitten/components";
+import ItemListItem from "../Items/ItemListItem";
 
 import { createPaginationContainer, graphql } from "react-relay";
+import { PaginationLoader } from "../Extras/Loaders";
 
 function _loadMore(props) {
   console.log(
@@ -24,6 +25,7 @@ function _loadMore(props) {
 }
 
 function Wishlist(props) {
+  const { navigation } = props;
   const showToast = (message) => {
     ToastAndroid.showWithGravity(
       message,
@@ -35,13 +37,19 @@ function Wishlist(props) {
   const onAddWishList = (product, index) => {
     showToast(`Removed from your wishlist`);
   };
+  const onItemPress = (event) => {
+    navigation.navigate("Details", {
+      typeId: event.typeId,
+    });
+  };
   const renderProductItem = ({ item }) => {
     return (
       <>
-        <ItemList
+        <ItemListItem
           style={styles.item}
           index={item.node.id}
           item={item.node}
+          onItemPress={onItemPress}
           // onProductChange={onItemChange}
           onAddWishList={onAddWishList}
         />
@@ -49,14 +57,22 @@ function Wishlist(props) {
       </>
     );
   };
+  const renderFooter = () => {
+    if (props.relay.hasMore()) {
+      return <PaginationLoader />;
+    } else {
+      return <></>;
+    }
+  };
   return (
     <Layout style={styles.container} level="2">
-        <List
-          data={props.wishlist.getUserWishList.edges}
-          renderItem={renderProductItem}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => _loadMore(props)}
-        />
+      <List
+        data={props.wishlist.getUserWishList.edges}
+        renderItem={renderProductItem}
+        onEndReachedThreshold={0.5}
+        onEndReached={() => _loadMore(props)}
+        ListFooterComponent={renderFooter}
+      />
     </Layout>
   );
 }
@@ -72,7 +88,7 @@ module.exports = createPaginationContainer(
             cursor
             node {
               id
-              ...ItemList_item
+              ...ItemListItem_item
             }
           }
           pageInfo {

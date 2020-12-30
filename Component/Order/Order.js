@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  ListRenderItemInfo,
   StyleSheet,
-  ToastAndroid,
   View,
 } from "react-native";
-import { Button, Layout, List, Text, Divider } from "@ui-kitten/components";
+import { Layout, Text } from "@ui-kitten/components";
 import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 import { QueryRenderer, graphql } from "react-relay";
 import OrderList from "../ListPage/OrderList";
+import {HomePageLoader} from '../Extras/Loaders';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -39,14 +38,14 @@ export default function Order({ navigation }) {
             return <Text>Error!</Text>;
           }
           if (!props) {
-            return <Text>Loading...</Text>;
+            return <HomePageLoader />;
           }
           return (
             <>
               <View
                 style={{
                   display: "flex",
-                  margin: 8,
+                  margin: 4,
                   flexDirection: "row",
                   justifyContent: "center",
                 }}

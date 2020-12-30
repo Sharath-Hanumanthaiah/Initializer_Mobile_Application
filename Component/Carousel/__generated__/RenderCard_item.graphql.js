@@ -14,9 +14,13 @@ declare export opaque type RenderCard_item$fragmentType: RenderCard_item$ref;
 export type RenderCard_item = {|
   +name: ?string,
   +widget: string,
+  +itemType: string,
+  +typeId: ?string,
   +content: ?$ReadOnlyArray<?{|
     +id: string,
+    +previousApiId: string,
     +name: ?string,
+    +offer: ?string,
     +imageLink: ?string,
   |}>,
   +$refType: RenderCard_item$ref,
@@ -55,7 +59,21 @@ return {
     {
       "alias": null,
       "args": null,
-      "concreteType": "ItemCategory",
+      "kind": "ScalarField",
+      "name": "itemType",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "typeId",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "HomePageContent",
       "kind": "LinkedField",
       "name": "content",
       "plural": true,
@@ -67,7 +85,21 @@ return {
           "name": "id",
           "storageKey": null
         },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "previousApiId",
+          "storageKey": null
+        },
         (v0/*: any*/),
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "offer",
+          "storageKey": null
+        },
         {
           "alias": null,
           "args": null,
@@ -84,6 +116,6 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '564df359ed710b3ef6b91adf017af64b';
+(node/*: any*/).hash = 'cbb30f3e3f7f9dafe9341c81d1662327';
 
 module.exports = node;

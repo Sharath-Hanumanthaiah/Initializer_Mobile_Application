@@ -1,132 +1,129 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import { Button, ListItem, ListItemProps, Text } from "@ui-kitten/components";
-import { ButtonGroup } from "react-native-elements";
+import React from "react";
+import {  StyleSheet } from "react-native";
 
-import { createFragmentContainer, graphql } from "react-relay";
+import {  Layout, List, Divider } from "@ui-kitten/components";
+import ItemListItem from "../Items/ItemListItem";
 
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  createPaginationContainer,
+  graphql,
+} from "react-relay";
+import { PaginationLoader } from "../Extras/Loaders";
 
-function ItemList(props) {
-  const index = props.item.previousApiId;
-  const product = props.item;
-  const {
-    style,
-    onProductChange,
-    onItemPress,
-    onAddWishList,
-    ...listItemProps
-  } = props;
-  const [availabilityIndex, setAvailabilityIndex] = useState(0);
-  const buttons = product.itemAvailability.map((e) => {
-    return `${e.value} ${e.unit}`;
-  });
-  const WishListIconActive = (props) => (
-    <MaterialCommunityIcons name="heart" size={23} color="tomato" />
-  );
-  const WishListIconInactive = (style) => (
-    <MaterialCommunityIcons name="heart-outline" size={23} color="tomato" />
-  );
-  const addToWishList = (props) => {
-    onAddWishList(product, index);
-  };
-  const updateIndex = (selectedIndex) => {
-    setAvailabilityIndex(selectedIndex);
-  };
-  return (
-    <ListItem
-      key={product.id}
-      onPress={onItemPress}
-      {...listItemProps}
-      style={[styles.container, style]}
-    >
-      <Image style={styles.image} source={{uri: product.imageLink}} />
-      <View style={styles.detailsContainer}>
-        <View style={{ width: "90%" }}>
-          <Text category="h6" style={{}}>
-            {product.name}
-          </Text>
-          {/* <Text
-              appearance='hint'
-              category='p2'>
-              {product.subtitle}
-            </Text> */}
-        </View>
-        <ButtonGroup
-          onPress={updateIndex}
-          selectedIndex={availabilityIndex}
-          buttons={buttons}
-          containerStyle={styles.availablityContainer}
-          textStyle={{ fontSize: 13, color: "#8c8c8c" }}
-          selectedTextStyle={{ fontSize: 13, color: "#f77a55" }}
-          buttonStyle={{ width: 60, borderRadius: 10 }}
-          innerBorderStyle={{ color: "#fff" }}
-          selectedButtonStyle={{
-            backgroundColor: "#fff",
-            borderColor: "#f77a55",
-            borderWidth: 1,
-            padding: 6,
-            borderRadius: 10,
-          }}
-        />
-        {product.itemAvailability[availabilityIndex] !== undefined ? (
-          <>
-            <Text category="s2" style={styles.discount}>
-              {product.itemAvailability[availabilityIndex].discount
-                ? `${product.itemAvailability[availabilityIndex].discount} % off`
-                : ""}
-            </Text>
-            <View style={styles.amountContainer}>
-              <Text style={styles.discountPrice} category="h6">
-                {`₹ ${product.itemAvailability[availabilityIndex].discountPrice}`}
-              </Text>
-              <Text style={styles.actualPrice} category="s2">
-                {`₹ ${product.itemAvailability[availabilityIndex].actualPrice}`}
-              </Text>
-            </View>
-          </>
-        ) : (
-          <></>
-        )}
-      </View>
-      <Button
-        style={[styles.iconButton, styles.removeButton]}
-        appearance="ghost"
-        status="basic"
-        accessoryLeft={
-          product.isWishlist ? WishListIconActive : WishListIconInactive
-        }
-        onPress={addToWishList}
-      />
-    </ListItem>
+
+function _loadMore(props) {
+  console.log("starting loading more", props.relay.hasMore(), props.relay.isLoading());
+  if (!props.relay.hasMore() || props.relay.isLoading()) {
+    return;
+  }
+  console.log("loading more");
+  props.relay.loadMore(
+    5,  // Fetch the next 10 feed items
+    error => {
+      console.log(error);
+    },
   );
 }
 
-export default createFragmentContainer(ItemList, {
-  item: graphql`
-    # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
-    fragment ItemList_item on ItemDetails {
-      id
-      previousApiId
-      name
-      imageLink
-      isWishlist
-      itemAvailability {
-        actualPrice
-        discount
-        discountPrice
-        value
-        unit
-      }
+function ItemList(props) {
+  const {onItemPress} = props;
+  const renderProductItem = ({ item }) => (
+    <>
+      <ItemListItem
+        style={styles.item}
+        index={item.node.id}
+        item={item.node}
+        onItemPress={onItemPress}
+        // onProductChange={onItemChange}
+        // onAddWishList={onAddWishList}
+      />
+      <Divider style={styles.divider} />
+    </>
+  );
+  const renderFooter = () => {
+    if (props.relay.hasMore()) {
+      return <PaginationLoader />;
+    } else {
+      return <></>;
     }
-  `,
-});
+  };
+  return (
+    <Layout style={styles.container} level="2">
+      <List
+        data={props.items.getItemDetails.edges}
+        renderItem={renderProductItem}
+        onEndReachedThreshold={0.5}
+        onEndReached={() => _loadMore(props)}
+        ListFooterComponent={renderFooter}
+      />
+    </Layout>
+  );
+}
+
+module.exports = createPaginationContainer(
+  ItemList,
+  {
+    items: graphql`
+      fragment ItemList_items on Query {
+        getItemDetails(
+          first: $count
+          after: $after
+          itemType: $itemType
+          typeId: $typeId
+        ) @connection(key: "ItemList_getItemDetails") {
+          edges {
+            cursor
+            node {
+              id
+              ...ItemListItem_item
+            }
+          }
+        }
+      }
+    `,
+  },
+  {
+    direction: "forward",
+    getConnectionFromProps(props) {
+      return props.item && props.item.getItemDetails;
+    },
+    // This is also the default implementation of `getFragmentVariables` if it isn't provided.
+    getFragmentVariables(prevVars, totalCount) {
+      return {
+        ...prevVars,
+        count: totalCount,
+      };
+    },
+    getVariables(props, { count, cursor }, fragmentVariables) {
+      console.log("getVariable", fragmentVariables, "prop", props);
+      return {
+        count: count,
+        after: props.address.getAddress.pageInfo.endCursor,
+        itemType: fragmentVariables.itemType,
+        typeId: fragmentVariables.typeId,
+        // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
+        // userID: fragmentVariables.userID,
+      };
+    },
+    query: graphql`
+      # Pagination query to be fetched upon calling 'loadMore'.
+      # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
+      query ItemListQuery(
+        $count: Int!
+        $after: String
+        $itemType: String!
+        $typeId: ID!
+      ) {
+        ...ItemList_items
+      }
+    `,
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "flex-start",
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    flex: 1,
+    margin: 3,
   },
   image: {
     margin: 10,

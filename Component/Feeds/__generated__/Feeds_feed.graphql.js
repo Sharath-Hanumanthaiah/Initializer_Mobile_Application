@@ -20,7 +20,7 @@ export type Feeds_feed = {|
         +itemType: string,
         +name: ?string,
         +previousApiId: string,
-        +typeId: string,
+        +typeId: ?string,
         +widget: string,
         +$fragmentRefs: RenderCard_item$ref,
       |}

@@ -18,6 +18,7 @@ function RenderCard(props) {
             style={props.item.widget}
             itemsPerInterval={1}
             onItemPress={onItemPress}
+            itemType= {props.item.itemType}
             item={props.item.content}
           ></Carousel>
           <Divider />
@@ -29,7 +30,7 @@ function RenderCard(props) {
           <FeedsItemContiner title={props.item.name}>
             <ItemCard
               item={props.item.content}
-              // categoryId={item.node.typeId}
+              itemType= {props.item.itemType}
               onItemPress={onItemPress}
             />
           </FeedsItemContiner>
@@ -42,6 +43,7 @@ function RenderCard(props) {
           <FeedsItemContiner title={props.item.name}>
             <MultiItemCard
               item={props.item.content}
+              itemType= {props.item.itemType}
               onItemPress={onItemPress}
             />
           </FeedsItemContiner>
@@ -59,9 +61,13 @@ module.exports = createFragmentContainer(RenderCard, {
     fragment RenderCard_item on HomePage {
       name
       widget
+      itemType
+      typeId
       content {
         id
+        previousApiId
         name
+        offer
         imageLink 
       }
     }

@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
 import { View} from "react-native";
 import { Text } from "@ui-kitten/components";
 
 import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 import { QueryRenderer, graphql } from "react-relay";
-
+import {HomePageLoader} from '../Extras/Loaders'
 import Wishlist from './Wishlist';
 const ITEMS_PER_PAGE = 4;
 
-export default function WishlistQuery() {
+export default function WishlistQuery({ navigation, route }) {
     return (
         <QueryRenderer
           environment={RelayEnvironment}
@@ -28,7 +27,7 @@ export default function WishlistQuery() {
               return <Text>Error!</Text>;
             }
             if (!props) {
-              return <Text>Loading...</Text>;
+              return <HomePageLoader />;
             }
             return (
               <>
@@ -45,7 +44,7 @@ export default function WishlistQuery() {
                     My Wishlist
                   </Text>
                 </View>
-                <Wishlist wishlist={props} />
+                <Wishlist wishlist={props} navigation={navigation} />
               </>
             );
           }}
