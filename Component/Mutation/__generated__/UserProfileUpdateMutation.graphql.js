@@ -9,10 +9,9 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 export type UserDetailsInput = {|
-  email?: ?string,
   firstName?: ?string,
+  id: string,
   lastName?: ?string,
-  previousApiId: string,
 |};
 export type UserProfileUpdateMutationVariables = {|
   input: UserDetailsInput
@@ -21,10 +20,8 @@ export type UserProfileUpdateMutationResponse = {|
   +updateUser: ?{|
     +userDetails: ?{|
       +id: string,
-      +previousApiId: string,
       +firstName: ?string,
       +lastName: ?string,
-      +email: ?string,
     |}
   |}
 |};
@@ -42,10 +39,8 @@ mutation UserProfileUpdateMutation(
   updateUser(input: $input) {
     userDetails {
       id
-      previousApiId
       firstName
       lastName
-      email
     }
   }
 }
@@ -93,13 +88,6 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "previousApiId",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
             "name": "firstName",
             "storageKey": null
           },
@@ -108,13 +96,6 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "lastName",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "email",
             "storageKey": null
           }
         ],
@@ -142,16 +123,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "1fa92f720ce4fa9cf0bca5397fa31c14",
+    "cacheID": "de2580be3e497b05cd4ba1038440a362",
     "id": null,
     "metadata": {},
     "name": "UserProfileUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation UserProfileUpdateMutation(\n  $input: UserDetailsInput!\n) {\n  updateUser(input: $input) {\n    userDetails {\n      id\n      previousApiId\n      firstName\n      lastName\n      email\n    }\n  }\n}\n"
+    "text": "mutation UserProfileUpdateMutation(\n  $input: UserDetailsInput!\n) {\n  updateUser(input: $input) {\n    userDetails {\n      id\n      firstName\n      lastName\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a71c570c8be78726a02c8eea01e10572';
+(node/*: any*/).hash = 'a3742109fd0e503c60f7b0c88650bf09';
 
 module.exports = node;

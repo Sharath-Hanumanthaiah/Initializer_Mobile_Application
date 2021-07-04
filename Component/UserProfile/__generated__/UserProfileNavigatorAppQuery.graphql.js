@@ -24,7 +24,7 @@ export type UserProfileNavigatorAppQuery = {|
 
 /*
 query UserProfileNavigatorAppQuery(
-  $userID: ID!
+  $userID: String!
 ) {
   ...UserProfileHeader_user
 }
@@ -32,7 +32,6 @@ query UserProfileNavigatorAppQuery(
 fragment UserProfileHeader_user on Query {
   getUserById(id: $userID) {
     id
-    previousApiId
     firstName
     lastName
     email
@@ -95,13 +94,6 @@ return {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "previousApiId",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
             "name": "firstName",
             "storageKey": null
           },
@@ -125,16 +117,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "540ee42c39e0b0b3e400defa53c502cf",
+    "cacheID": "47a83bdba2d30c2e03e95542ea0f890f",
     "id": null,
     "metadata": {},
     "name": "UserProfileNavigatorAppQuery",
     "operationKind": "query",
-    "text": "query UserProfileNavigatorAppQuery(\n  $userID: ID!\n) {\n  ...UserProfileHeader_user\n}\n\nfragment UserProfileHeader_user on Query {\n  getUserById(id: $userID) {\n    id\n    previousApiId\n    firstName\n    lastName\n    email\n  }\n}\n"
+    "text": "query UserProfileNavigatorAppQuery(\n  $userID: String!\n) {\n  ...UserProfileHeader_user\n}\n\nfragment UserProfileHeader_user on Query {\n  getUserById(id: $userID) {\n    id\n    firstName\n    lastName\n    email\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '368bb42d70d8d0334b6303026c5ad420';
+(node/*: any*/).hash = '59273890bc7c5294b82f13fb88252002';
 
 module.exports = node;

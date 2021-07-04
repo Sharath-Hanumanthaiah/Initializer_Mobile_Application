@@ -17,7 +17,6 @@ export type ItemSubCategory_subCategory = {|
       +cursor: ?string,
       +node: ?{|
         +id: string,
-        +previousApiId: string,
         +name: ?string,
         +offer: ?string,
         +imageLink: ?string,
@@ -113,13 +112,6 @@ const node/*: ReaderFragment*/ = {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "previousApiId",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
                   "name": "name",
                   "storageKey": null
                 },
@@ -183,6 +175,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = '56056a6a2f7425bb75a8f5c6504037e0';
+(node/*: any*/).hash = '885c4b954b232cbe774d6ae0ab5e3449';
 
 module.exports = node;

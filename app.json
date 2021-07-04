@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "Shopping Mart",
-    "slug": "Mart",
+    "name": "Initializers",
+    "slug": "Init",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "https://res.cloudinary.com/dsywyhhdl/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1590678445/Capture_tndec6.png",
     "android" : {
-      "package": "com.initializers.shoppingmart",
-      "enableDangerousExperimentalLeanBuilds": true,
+      "package": "com.init.initializers.shoppingmart",
       "versionCode": 1,
       "splash": {
         "ldpi": "./assets/image/drawable-ldpi/splash.png",
@@ -29,7 +28,7 @@
       "supportsTablet": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "https://res.cloudinary.com/dsywyhhdl/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1590678445/Capture_tndec6.png"
     }
   }
 }

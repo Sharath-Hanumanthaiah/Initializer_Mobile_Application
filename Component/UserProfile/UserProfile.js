@@ -1,14 +1,16 @@
 export default class UserProfile {
-  id;
-  previousApiId;
-  firstName;
-  lastName;
-  email;
+  id = "";
+  previousApiId = "";
+  firstName = "";
+  lastName = "";
+  email = "";
   constructor() {
-    this.id = "";
-    this.previousApiId = "";
-    this.firstName = "";
-    this.lastName = "";
-    this.email = "";
+    if (!UserProfile._instance) {
+      UserProfile._instance = this;
+    }
+    return UserProfile._instance;
+  }
+  static getInstance() {
+    return this._instance;
   }
 }

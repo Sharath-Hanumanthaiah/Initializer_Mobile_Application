@@ -14,7 +14,6 @@ declare export opaque type UserProfileHeader_user$fragmentType: UserProfileHeade
 export type UserProfileHeader_user = {|
   +getUserById: ?{|
     +id: string,
-    +previousApiId: string,
     +firstName: ?string,
     +lastName: ?string,
     +email: ?string,
@@ -66,13 +65,6 @@ const node/*: ReaderFragment*/ = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "previousApiId",
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
           "name": "firstName",
           "storageKey": null
         },
@@ -98,6 +90,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = '24134e1f88dbd18667256fc0496532b0';
+(node/*: any*/).hash = '8b9867a383dad3033c7981b0a42eb988';
 
 module.exports = node;

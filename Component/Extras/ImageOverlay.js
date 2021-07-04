@@ -24,7 +24,10 @@ export default function ImageOverlay(props) {
       onLoad={() => setLoading(true)}
       onLoadEnd={() => setLoading(false)}
     >
-      {loading ? <CardLoader type={type} /> : <>{children}</>}
+      {/* <View style={{width: '100%', height: '100%'}}> */}
+      {children}
+      {/* </View> */}
+      {/* {loading ? <CardLoader type={type} /> : <>{children}</>} */}
     </ImageBackground>
   );
 }

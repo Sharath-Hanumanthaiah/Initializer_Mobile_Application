@@ -39,7 +39,6 @@ fragment ItemSubCategory_subCategory on Query {
       cursor
       node {
         id
-        previousApiId
         name
         offer
         imageLink
@@ -159,13 +158,6 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "previousApiId",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
                     "name": "name",
                     "storageKey": null
                   },
@@ -238,12 +230,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c23ede432005cccf8510dfaf616518f0",
+    "cacheID": "699fc98a60236b0e028b6bb464cfa015",
     "id": null,
     "metadata": {},
     "name": "ItemSubCategoryQuery",
     "operationKind": "query",
-    "text": "query ItemSubCategoryQuery(\n  $count: Int!\n  $after: String\n  $categoryId: ID!\n) {\n  ...ItemSubCategory_subCategory\n}\n\nfragment ItemSubCategory_subCategory on Query {\n  getItemSubCategoryByCategoryId(first: $count, after: $after, categoryId: $categoryId) {\n    edges {\n      cursor\n      node {\n        id\n        previousApiId\n        name\n        offer\n        imageLink\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query ItemSubCategoryQuery(\n  $count: Int!\n  $after: String\n  $categoryId: ID!\n) {\n  ...ItemSubCategory_subCategory\n}\n\nfragment ItemSubCategory_subCategory on Query {\n  getItemSubCategoryByCategoryId(first: $count, after: $after, categoryId: $categoryId) {\n    edges {\n      cursor\n      node {\n        id\n        name\n        offer\n        imageLink\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

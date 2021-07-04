@@ -8,10 +8,11 @@ import UserProfileNavigator from '../UserProfile/UserProfileNavigator';
 import OrderNavigator from '../Order/OrderNavigator';
 import FeedsNavigator from '../Feeds/FeedsNavigator';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as UserStore from '../Extras/UserData';
 
 const Tab = createBottomTabNavigator();
 export default function Home({route, navigation}) {
-  const { AppColor } = route.params;
+  const { AppColor, queryRef } = route.params;
   SplashScreen.hideAsync();
     return(
     <Tab.Navigator
@@ -42,7 +43,7 @@ export default function Home({route, navigation}) {
         inactiveTintColor: 'gray',
       }}>
         <Tab.Screen name="Feeds" component={FeedsNavigator} options={{title: "Home"}} 
-        initialParams={{AppColor: AppColor}}/>
+        initialParams={{AppColor: AppColor, queryRef: queryRef}}/>
         <Tab.Screen name="WishList" component={WishlistNavigator} options={{title: "WishList"}}/>
         <Tab.Screen name="Cart" component={CartNavigator} options={{title: "Cart"}}/>
         <Tab.Screen name="Order" component={OrderNavigator} options={{title: "Order"}}/>

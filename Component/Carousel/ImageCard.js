@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, Dimensions } from 'react-native';
 import { Card, List } from '@ui-kitten/components';
 
 export default function ImageCard(props) {
@@ -9,8 +9,8 @@ export default function ImageCard(props) {
             return(
             <Card
             key={index}
-            style={{...styles.item, width:width/items.length}} 
-            // onPress={() => {}}
+            style={{...styles.item, width: Dimensions.get('window').width}} 
+            // onPress={() => {}} width/items.length
             >
             {/* <Image source={item.image} style={styles.image}/> */}
             <Image source={{uri: item}} style={styles.image} />
@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
       marginBottom: -8
     },
     image: {
-        zIndex: 1,
+        // zIndex: 1,
         width: '100%',
         height: '100%',
         borderRadius: 3,
-        resizeMode: "center"
+        resizeMode: "contain"
         // marginRight: -8,
     }
   });

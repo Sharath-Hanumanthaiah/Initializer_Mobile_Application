@@ -16,7 +16,9 @@ export type ItemDetail_comment = {|
     +edges: ?$ReadOnlyArray<?{|
       +cursor: ?string,
       +node: ?{|
-        +id: ?string,
+        +id: string,
+        +itemId: ?string,
+        +userId: ?string,
         +userName: ?string,
         +rating: ?number,
         +review: ?string,
@@ -97,7 +99,7 @@ const node/*: ReaderFragment*/ = {
             {
               "alias": null,
               "args": null,
-              "concreteType": "UserReview",
+              "concreteType": "UserReviewOutput",
               "kind": "LinkedField",
               "name": "node",
               "plural": false,
@@ -107,6 +109,20 @@ const node/*: ReaderFragment*/ = {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "id",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "itemId",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "userId",
                   "storageKey": null
                 },
                 {
@@ -183,6 +199,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = 'e7254e6da730d2b2714ac9b9b38fc7b0';
+(node/*: any*/).hash = '621686e0741623ff5e4b4a22ab9e5889';
 
 module.exports = node;

@@ -1,19 +1,30 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import RelayEnvironment from '../../GraphQLUtils/RelayEnvironment';
 import { QueryRenderer, graphql } from "react-relay";
 import {ITEMS_PER_PAGE} from '../Extras/Constants';
 import {HomePageLoader} from '../Extras/Loaders';
-import AddressList from './AddressList'
+import AddressList from './AddressList';
+import * as SecureStore from "expo-secure-store";
 
 export default function AddressListQuery(props) {
-    const userID = 1;
-    const{navigation} = props;
+  const{navigation, callBack} = props;
+  const [userId, setUserId] = useState();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    SecureStore.getItemAsync("userId").then((userId) => {
+      setUserId(userId);
+      setLoading(false);
+    });
+  }, []);
+  if (loading) {
+    return <HomePageLoader />;
+  } else {
     return(
         <QueryRenderer
         environment={RelayEnvironment}
         query={graphql`
           query AddressListQueryAppQuery(
-            $userID: ID!,
+            $userID: String!,
             $count: Int!,
             $after: String
       ) {
@@ -21,7 +32,7 @@ export default function AddressListQuery(props) {
           }
         `}
         variables={{
-          userID: userID,
+          userID: userId,
           count: ITEMS_PER_PAGE,  
           after: 0
         }}
@@ -35,9 +46,12 @@ export default function AddressListQuery(props) {
           return (
               <AddressList 
               address={props} 
-              navigation={navigation} />
+              callBack={callBack}
+              navigation={navigation}
+              userId={userId} />
           );
         }}
       />
     )
+  }
 }

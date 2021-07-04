@@ -16,7 +16,6 @@ export type AddressList_address = {|
     +edges: ?$ReadOnlyArray<?{|
       +node: ?{|
         +id: string,
-        +previousApiId: string,
         +name: ?string,
         +firstLine: ?string,
         +secondLine: ?string,
@@ -96,13 +95,6 @@ const node/*: ReaderFragment*/ = {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "id",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "previousApiId",
                   "storageKey": null
                 },
                 {
@@ -200,6 +192,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = '8767062546617698fba8e5cfb66cbd35';
+(node/*: any*/).hash = '2d0782a622fa76e7379789deb08143df';
 
 module.exports = node;

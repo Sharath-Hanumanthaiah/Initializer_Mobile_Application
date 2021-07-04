@@ -15,20 +15,20 @@ export default function OrderNavigator() {
       screenOptions={{
         headerTitle: () => <Header />,
         headerRight: () => <HeaderRight />,
+        headerTitleAlign: 'left',
         headerStyle: {
           backgroundColor: AppColor.Vibrant,
         },
       }}
     >
       <OrderStack.Screen
-        name="Home"
+        name="Orders"
         component={Order}
-        options={{ title: "My home" }}
       />
       <OrderStack.Screen
         name="Details"
         component={OrderDetail}
-        options={{ title: "My home" }}
+        options={{ title: "My home", headerBackTitleStyle: {fontSize : 14} }}
       />
     </OrderStack.Navigator>
   );

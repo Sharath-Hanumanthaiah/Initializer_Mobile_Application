@@ -3,17 +3,16 @@ import {ConnectionHandler, ROOT_ID} from 'relay-runtime';
 import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 
 const mutation = graphql`
-  mutation AddressDeleteMutation($id: ID!) {
+  mutation AddressDeleteMutation($id: String!) {
     deleteAddress(id: $id)
   }
 `;
 
 export default (
-  id,
-  previousApiId
+  id
 ) => {
   const variables = {
-    id: previousApiId
+    id: id
   };
   commitMutation(RelayEnvironment, {
     mutation,

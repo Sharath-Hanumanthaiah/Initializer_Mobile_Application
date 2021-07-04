@@ -1,9 +1,13 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { Layout, Text, ViewPager, Button } from "@ui-kitten/components";
+import React, {useState} from "react";
+import { StyleSheet, Alert } from "react-native";
+import { Layout } from "@ui-kitten/components";
 import StepIndicator from "react-native-step-indicator";
+import AddressListQuery from "../Address/AddressListQuery";
+import CheckOutOrderDetails from "./CheckOutOrderDetails";
+import CreateOrderFromCartMutation from "../Mutation/CreateOrderFromCartMutation";
+import {MutationPageLoader} from '../Extras/Loaders';
 
-const labels = ["Shipping Address", "Confirm"];
+const labels = ["Select Address", "Order Summery"];
 const customStyles = {
   stepIndicatorSize: 25,
   currentStepIndicatorSize: 30,
@@ -28,9 +32,84 @@ const customStyles = {
   currentStepLabelColor: "#fe7013",
 };
 
-export default function CheckOut() {
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-
+export default function CheckOut(props) {
+  // let checkOutModel = new CheckOutModel();
+  const { route, navigation } = props;
+  const { checkOutModel, userId } = route.params;
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  // Temp
+  const displayBody = () => {
+    switch (selectedIndex) {
+      case 0:
+        const addressCallBack = (props) => {
+          checkOutModel.address = props;
+          setSelectedIndex(1);
+        };
+        return (
+          <Layout style={styles.tab} level="2">
+            <AddressListQuery
+              navigation={navigation}
+              callBack={addressCallBack}
+            />
+          </Layout>
+        );
+      case 1:
+        const confirmCallBack = (orderId, paymentMode) => {
+          setLoading(true);
+          const callback = (orderId, externalOrderId, gatewayName, secretKey, publicKey) => {
+            setLoading(false);
+            checkOutModel.orderId = orderId;
+            if (paymentMode === "C") {
+              navigation.navigate("PaymentPage", {
+                orderId: orderId,
+                publicKey: publicKey,
+                externalOrderId: externalOrderId,
+                gatewayId: gatewayName,
+                totalAmount: checkOutModel.totalAmount,
+                userId: userId
+              });
+            } else {
+              // Cash on delivery, no need for online payment
+              Alert.alert(
+                "Order successfully placed!!",
+                "Thanks for placing your order",
+                [
+                  {
+                    text: "Continue",
+                    onPress: () => {
+                      navigation.replace("OrderDetails", {
+                        orderId: orderId,
+                        userId: userId,
+                      });
+                    },
+                  },
+                ],
+                { cancelable: false }
+              );
+            }
+          };
+          CreateOrderFromCartMutation(
+            userId,
+            "",
+            paymentMode,
+            checkOutModel,
+            callback
+          );
+        };
+        return (
+          <Layout style={styles.confirmtab} level="2">
+            <CheckOutOrderDetails
+              checkOutModel={checkOutModel}
+              callBack={confirmCallBack}
+            />
+            {loading ? <MutationPageLoader />: <></>}
+          </Layout>
+        );
+      default:
+        return <></>;
+    }
+  };
   return (
     <>
       <Layout level="2" style={{ margin: 4 }}>
@@ -41,28 +120,16 @@ export default function CheckOut() {
           labels={labels}
         />
       </Layout>
-      <ViewPager
-        selectedIndex={selectedIndex}
-        onSelect={(index) => setSelectedIndex(index)}
-      >
-        {/* <Layout style={styles.tab} level="2">
-          <Text category="h5">USERS</Text> */}
-        <View>
-          <Text category="h5">Select Shipping address</Text>
-        </View>
-        {/* </Layout> */}
-        <Layout style={styles.tab} level="2">
-          <Text category="h5">ORDERS</Text>
-        </Layout>
-      </ViewPager>
+      {displayBody()}
     </>
   );
 }
 
 const styles = StyleSheet.create({
   tab: {
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    height: "94%",
+  },
+  confirmtab: {
+    height: "89%",
   },
 });

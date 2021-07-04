@@ -14,12 +14,14 @@ export default function WishListNavigator() {
         screenOptions={{
           headerTitle: () => <Header />,
           headerRight: () => <HeaderRight />,
+          headerTitleAlign : 'left',
+          headerBackTitleStyle: {fontSize: 11},
           headerStyle: {
             backgroundColor: AppColor.Vibrant,
           },
         }}
       >
-        <WishlistStack.Screen name="Profile" component={WishlistQuery} />
+        <WishlistStack.Screen name="WishList" component={WishlistQuery} />
         <WishlistStack.Screen name="Details" component={ItemDetailsQuery} />
       </WishlistStack.Navigator>
     );

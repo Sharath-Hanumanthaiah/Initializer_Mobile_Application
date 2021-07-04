@@ -8,40 +8,39 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type OrderList_orders$ref = any;
-export type OrderListQueryVariables = {|
-  count: number,
+type Feeds_feed$ref = any;
+export type FeedgetHomePageRefetchQueryVariables = {|
   after?: ?string,
-  userId: string,
+  count?: ?number,
 |};
-export type OrderListQueryResponse = {|
-  +$fragmentRefs: OrderList_orders$ref
+export type FeedgetHomePageRefetchQueryResponse = {|
+  +$fragmentRefs: Feeds_feed$ref
 |};
-export type OrderListQuery = {|
-  variables: OrderListQueryVariables,
-  response: OrderListQueryResponse,
+export type FeedgetHomePageRefetchQuery = {|
+  variables: FeedgetHomePageRefetchQueryVariables,
+  response: FeedgetHomePageRefetchQueryResponse,
 |};
 */
 
 
 /*
-query OrderListQuery(
-  $count: Int!
+query FeedgetHomePageRefetchQuery(
   $after: String
-  $userId: ID!
+  $count: Int
 ) {
-  ...OrderList_orders
+  ...Feeds_feed
 }
 
-fragment OrderList_orders on Query {
-  getUserOrderSet(first: $count, after: $after, userId: $userId) {
+fragment Feeds_feed on Query {
+  getHomePage(first: $count, after: $after) {
     edges {
       node {
         id
-        previousApiId
-        deliveredBy
-        orderDetails
-        totalAmount
+        itemType
+        name
+        typeId
+        widget
+        ...RenderCard_item
         __typename
       }
       cursor
@@ -52,25 +51,35 @@ fragment OrderList_orders on Query {
     }
   }
 }
+
+fragment RenderCard_item on HomePage {
+  name
+  widget
+  itemType
+  typeId
+  content {
+    id
+    name
+    offer
+    imageLink
+  }
+}
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
-  "defaultValue": null,
-  "kind": "LocalArgument",
-  "name": "after"
-},
-v1 = {
-  "defaultValue": null,
-  "kind": "LocalArgument",
-  "name": "count"
-},
-v2 = {
-  "defaultValue": null,
-  "kind": "LocalArgument",
-  "name": "userId"
-},
-v3 = [
+var v0 = [
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "after"
+  },
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "count"
+  }
+],
+v1 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -80,28 +89,33 @@ v3 = [
     "kind": "Variable",
     "name": "first",
     "variableName": "count"
-  },
-  {
-    "kind": "Variable",
-    "name": "userId",
-    "variableName": "userId"
   }
-];
+],
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+};
 return {
   "fragment": {
-    "argumentDefinitions": [
-      (v0/*: any*/),
-      (v1/*: any*/),
-      (v2/*: any*/)
-    ],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "OrderListQuery",
+    "name": "FeedgetHomePageRefetchQuery",
     "selections": [
       {
         "args": null,
         "kind": "FragmentSpread",
-        "name": "OrderList_orders"
+        "name": "Feeds_feed"
       }
     ],
     "type": "Query",
@@ -109,26 +123,22 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [
-      (v1/*: any*/),
-      (v0/*: any*/),
-      (v2/*: any*/)
-    ],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "OrderListQuery",
+    "name": "FeedgetHomePageRefetchQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v3/*: any*/),
-        "concreteType": "UserOrderSetConnection",
+        "args": (v1/*: any*/),
+        "concreteType": "HomePageConnection",
         "kind": "LinkedField",
-        "name": "getUserOrderSet",
+        "name": "getHomePage",
         "plural": false,
         "selections": [
           {
             "alias": null,
             "args": null,
-            "concreteType": "UserOrderSetConnectionEdge",
+            "concreteType": "HomePageConnectionEdge",
             "kind": "LinkedField",
             "name": "edges",
             "plural": true,
@@ -136,44 +146,59 @@ return {
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "UserOrderSet",
+                "concreteType": "HomePage",
                 "kind": "LinkedField",
                 "name": "node",
                 "plural": false,
                 "selections": [
+                  (v2/*: any*/),
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "id",
+                    "name": "itemType",
+                    "storageKey": null
+                  },
+                  (v3/*: any*/),
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "typeId",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "previousApiId",
+                    "name": "widget",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
-                    "kind": "ScalarField",
-                    "name": "deliveredBy",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "orderDetails",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "totalAmount",
+                    "concreteType": "HomePageContent",
+                    "kind": "LinkedField",
+                    "name": "content",
+                    "plural": true,
+                    "selections": [
+                      (v2/*: any*/),
+                      (v3/*: any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "offer",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "imageLink",
+                        "storageKey": null
+                      }
+                    ],
                     "storageKey": null
                   },
                   {
@@ -226,28 +251,26 @@ return {
       },
       {
         "alias": null,
-        "args": (v3/*: any*/),
-        "filters": [
-          "userId"
-        ],
+        "args": (v1/*: any*/),
+        "filters": null,
         "handle": "connection",
-        "key": "OrderList_getUserOrderSet",
+        "key": "Feed_getHomePage",
         "kind": "LinkedHandle",
-        "name": "getUserOrderSet"
+        "name": "getHomePage"
       }
     ]
   },
   "params": {
-    "cacheID": "1470c15317048bad688e94de7550e459",
+    "cacheID": "1785e20b17e697416e7358f340f88fd4",
     "id": null,
     "metadata": {},
-    "name": "OrderListQuery",
+    "name": "FeedgetHomePageRefetchQuery",
     "operationKind": "query",
-    "text": "query OrderListQuery(\n  $count: Int!\n  $after: String\n  $userId: ID!\n) {\n  ...OrderList_orders\n}\n\nfragment OrderList_orders on Query {\n  getUserOrderSet(first: $count, after: $after, userId: $userId) {\n    edges {\n      node {\n        id\n        previousApiId\n        deliveredBy\n        orderDetails\n        totalAmount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query FeedgetHomePageRefetchQuery(\n  $after: String\n  $count: Int\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  itemType\n  typeId\n  content {\n    id\n    name\n    offer\n    imageLink\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'bf251a3ba29a97e78ba2940f90c3c7f9';
+(node/*: any*/).hash = '6f8948cabbc504c85ccae91fac543f90';
 
 module.exports = node;

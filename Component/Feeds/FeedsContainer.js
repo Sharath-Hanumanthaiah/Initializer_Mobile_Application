@@ -1,33 +1,19 @@
 import React from "react";
-import { Text, View } from "react-native";
 import Feeds from "./Feeds";
-import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
-import { QueryRenderer, graphql } from "react-relay";
-import {HomePageLoader} from '../Extras/Loaders'
+import { graphql } from "react-relay";
+import { usePreloadedQuery, useQueryLoader } from 'react-relay/hooks';
+import FeedQuery from '../Feeds/__generated__/FeedsContainerAppQuery.graphql';
 
-const ITEMS_PER_PAGE = 4;
-export default function FeedsContainer({ navigation }) {
-  return (
-    <QueryRenderer
-      environment={RelayEnvironment}
-      query={graphql`
+export default function FeedsContainer({ navigation, route }) {
+  const {queryRef} = route.params;
+
+  const data = usePreloadedQuery(
+    graphql`
         query FeedsContainerAppQuery($count: Int!, $after: String) {
           ...Feeds_feed
         }
-      `}
-      variables={{
-        count: ITEMS_PER_PAGE,
-        after: 0,
-      }}
-      render={({ error, props }) => {
-        if (error) {
-          return <Text>Error!</Text>;
-        }
-        if (!props) {
-          return <HomePageLoader />;
-        }
-        return <Feeds navigation={navigation} feed={props} content={props} />;
-      }}
-    />
-  );
+      `,
+      queryRef
+  )
+  return <Feeds navigation={navigation} feed={data} content={data} />;
 }

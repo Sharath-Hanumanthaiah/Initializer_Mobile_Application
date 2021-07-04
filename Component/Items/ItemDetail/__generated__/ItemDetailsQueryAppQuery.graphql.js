@@ -28,8 +28,8 @@ export type ItemDetailsQueryAppQuery = {|
 
 /*
 query ItemDetailsQueryAppQuery(
-  $itemId: ID!
-  $userId: ID!
+  $itemId: String!
+  $userId: String!
   $count: Int!
   $after: String
 ) {
@@ -43,6 +43,8 @@ fragment ItemDetail_comment on Query {
       cursor
       node {
         id
+        itemId
+        userId
         userName
         rating
         review
@@ -60,7 +62,6 @@ fragment ItemDetail_comment on Query {
 fragment ItemDetail_item on Query {
   getItemDetailsById(itemId: $itemId, userId: $userId) {
     id
-    previousApiId
     name
     itemAvailability {
       id
@@ -181,13 +182,6 @@ return {
         "plural": false,
         "selections": [
           (v5/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "previousApiId",
-            "storageKey": null
-          },
           {
             "alias": null,
             "args": null,
@@ -324,12 +318,26 @@ return {
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "UserReview",
+                "concreteType": "UserReviewOutput",
                 "kind": "LinkedField",
                 "name": "node",
                 "plural": false,
                 "selections": [
                   (v5/*: any*/),
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "itemId",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "userId",
+                    "storageKey": null
+                  },
                   {
                     "alias": null,
                     "args": null,
@@ -413,16 +421,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f8abb4b2a00248ab044c41def57221b5",
+    "cacheID": "c970e86319d4cbe8bc2dd1d6ded1bdd1",
     "id": null,
     "metadata": {},
     "name": "ItemDetailsQueryAppQuery",
     "operationKind": "query",
-    "text": "query ItemDetailsQueryAppQuery(\n  $itemId: ID!\n  $userId: ID!\n  $count: Int!\n  $after: String\n) {\n  ...ItemDetail_item\n  ...ItemDetail_comment\n}\n\nfragment ItemDetail_comment on Query {\n  getItemReview(first: $count, after: $after, itemId: $itemId) {\n    edges {\n      cursor\n      node {\n        id\n        userName\n        rating\n        review\n        changedAt\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment ItemDetail_item on Query {\n  getItemDetailsById(itemId: $itemId, userId: $userId) {\n    id\n    previousApiId\n    name\n    itemAvailability {\n      id\n      actualPrice\n      discount\n      discountPrice\n      value\n      unit\n    }\n    description {\n      itemProperties\n      sellerName\n      disclaimer\n    }\n    imageLinks\n    isWishlist\n    averageRating\n  }\n}\n"
+    "text": "query ItemDetailsQueryAppQuery(\n  $itemId: String!\n  $userId: String!\n  $count: Int!\n  $after: String\n) {\n  ...ItemDetail_item\n  ...ItemDetail_comment\n}\n\nfragment ItemDetail_comment on Query {\n  getItemReview(first: $count, after: $after, itemId: $itemId) {\n    edges {\n      cursor\n      node {\n        id\n        itemId\n        userId\n        userName\n        rating\n        review\n        changedAt\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment ItemDetail_item on Query {\n  getItemDetailsById(itemId: $itemId, userId: $userId) {\n    id\n    name\n    itemAvailability {\n      id\n      actualPrice\n      discount\n      discountPrice\n      value\n      unit\n    }\n    description {\n      itemProperties\n      sellerName\n      disclaimer\n    }\n    imageLinks\n    isWishlist\n    averageRating\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '8ceceb0e49b02671b356cd9dba22452e';
+(node/*: any*/).hash = 'bc8e227aec3d830b2bf003a9e92b6032';
 
 module.exports = node;

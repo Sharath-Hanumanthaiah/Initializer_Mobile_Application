@@ -17,6 +17,7 @@ export default function OffersView(props) {
           style={{
             textAlign: "center",
             fontWeight: "bold",
+            padding: 2.5,
             color: AppColor.White,
           }}
         >
@@ -34,10 +35,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    borderRadius: 35,
+    borderRadius: 18,
     margin: 2,
-    width: 35,
-    height: 35,
+    width: 36,
+    height: 36,
     position: "absolute",
     top: 0,
     left: 0,

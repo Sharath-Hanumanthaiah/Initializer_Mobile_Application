@@ -1,32 +1,32 @@
 import React from "react";
-import {  StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-import {  Layout, List, Divider } from "@ui-kitten/components";
+import { Layout, List, Divider } from "@ui-kitten/components";
 import ItemListItem from "../Items/ItemListItem";
 
-import {
-  createPaginationContainer,
-  graphql,
-} from "react-relay";
+import { createPaginationContainer, graphql } from "react-relay";
 import { PaginationLoader } from "../Extras/Loaders";
 
-
 function _loadMore(props) {
-  console.log("starting loading more", props.relay.hasMore(), props.relay.isLoading());
+  console.log(
+    "starting loading more",
+    props.relay.hasMore(),
+    props.relay.isLoading()
+  );
   if (!props.relay.hasMore() || props.relay.isLoading()) {
     return;
   }
   console.log("loading more");
   props.relay.loadMore(
-    5,  // Fetch the next 10 feed items
-    error => {
+    5, // Fetch the next 10 feed items
+    (error) => {
       console.log(error);
-    },
+    }
   );
 }
 
 function ItemList(props) {
-  const {onItemPress} = props;
+  const { onItemPress, userId } = props;
   const renderProductItem = ({ item }) => (
     <>
       <ItemListItem
@@ -34,6 +34,7 @@ function ItemList(props) {
         index={item.node.id}
         item={item.node}
         onItemPress={onItemPress}
+        userId={userId}
         // onProductChange={onItemChange}
         // onAddWishList={onAddWishList}
       />
@@ -70,6 +71,7 @@ module.exports = createPaginationContainer(
           after: $after
           itemType: $itemType
           typeId: $typeId
+          userId: $userId
         ) @connection(key: "ItemList_getItemDetails") {
           edges {
             cursor
@@ -95,12 +97,12 @@ module.exports = createPaginationContainer(
       };
     },
     getVariables(props, { count, cursor }, fragmentVariables) {
-      console.log("getVariable", fragmentVariables, "prop", props);
       return {
         count: count,
         after: props.address.getAddress.pageInfo.endCursor,
         itemType: fragmentVariables.itemType,
         typeId: fragmentVariables.typeId,
+        userId: fragmentVariables.userId,
         // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
         // userID: fragmentVariables.userID,
       };
@@ -112,7 +114,8 @@ module.exports = createPaginationContainer(
         $count: Int!
         $after: String
         $itemType: String!
-        $typeId: ID!
+        $typeId: String!
+        $userId: String!
       ) {
         ...ItemList_items
       }

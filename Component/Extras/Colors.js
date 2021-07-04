@@ -6,5 +6,7 @@ export const AppColor = {
   Dull: "#f9a186",
   White: "#fff",
   Green: 'green',
-  Grey: '#808080'
+  Grey: '#808080',
+  Warning: '#FF8C00',
+  LightBackground: '#F7F9FC'
 };

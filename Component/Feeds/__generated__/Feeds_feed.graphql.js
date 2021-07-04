@@ -19,7 +19,6 @@ export type Feeds_feed = {|
         +id: string,
         +itemType: string,
         +name: ?string,
-        +previousApiId: string,
         +typeId: ?string,
         +widget: string,
         +$fragmentRefs: RenderCard_item$ref,
@@ -37,7 +36,11 @@ export type Feeds_feed$key = {
 */
 
 
-const node/*: ReaderFragment*/ = {
+const node/*: ReaderFragment*/ = (function(){
+var v0 = [
+  "getHomePage"
+];
+return {
   "argumentDefinitions": [
     {
       "kind": "RootArgument",
@@ -55,11 +58,21 @@ const node/*: ReaderFragment*/ = {
         "count": "count",
         "cursor": "after",
         "direction": "forward",
-        "path": [
-          "getHomePage"
-        ]
+        "path": (v0/*: any*/)
       }
-    ]
+    ],
+    "refetch": {
+      "connection": {
+        "forward": {
+          "count": "count",
+          "cursor": "after"
+        },
+        "backward": null,
+        "path": (v0/*: any*/)
+      },
+      "fragmentPathInResult": [],
+      "operation": require('./FeedgetHomePageRefetchQuery.graphql.js')
+    }
   },
   "name": "Feeds_feed",
   "selections": [
@@ -106,13 +119,6 @@ const node/*: ReaderFragment*/ = {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "name",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "previousApiId",
                   "storageKey": null
                 },
                 {
@@ -186,7 +192,8 @@ const node/*: ReaderFragment*/ = {
   "type": "Query",
   "abstractKey": null
 };
+})();
 // prettier-ignore
-(node/*: any*/).hash = 'a1e4f58c01ceb730b425ccb5968a2ffa';
+(node/*: any*/).hash = '6f8948cabbc504c85ccae91fac543f90';
 
 module.exports = node;

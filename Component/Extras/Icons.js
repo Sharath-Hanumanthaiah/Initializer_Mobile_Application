@@ -34,15 +34,39 @@ export const PlusIcon = () => (
 export const TinyStar = () => (
     <MaterialCommunityIcons name="star" size={15} style={{color: AppColor.White, marginHorizontal: 2}} />
 )
+export const MediumStar = (style) => (
+  <Icon {...style} name='star'/>
+)
 export const Delete = () => (
   <MaterialCommunityIcons name='delete' size={23} color={AppColor.Grey}/>
 )
-export const Search = () => (
-  <MaterialCommunityIcons name="magnify" size={25} style={{color: AppColor.White, marginHorizontal: 2}} />
+export const Search = (color) => (
+  <MaterialCommunityIcons name="magnify" size={25} style={{color: color? color : AppColor.White, marginHorizontal: 2}} />
 )
 
 export const Edit = () => (
   <MaterialCommunityIcons name="account-edit" size={35} style={{color: AppColor.White, marginHorizontal: 2}} />
+)
+export const UserEdit = () => (
+  <MaterialCommunityIcons name="account-edit" size={23} style={{color: AppColor.Light}} />
+)
+export const AddressIcon = () => (
+  <MaterialCommunityIcons name="ballot" size={23} style={{color: AppColor.Light}} />
+)
+export const PasswordIcon = () => (
+  <MaterialCommunityIcons name="key-variant" size={23} style={{color: AppColor.Light}} />
+)
+
+// card-account-details
+
+export const ArrowRight = (style) => (
+  <MaterialCommunityIcons name="chevron-right" size={23} style={{color: AppColor.Light, ...style.style}} />
+)
+export const ArrowDown = (style) => (
+  <MaterialCommunityIcons name="chevron-down" size={23} style={{color: AppColor.Light, ...style.style}} />
+)
+export const ArrowUp = (style) => (
+  <MaterialCommunityIcons name="chevron-up" size={23} style={{color: AppColor.Light, ...style.style}} />
 )
 export const FormEdit = () => (
   <MaterialCommunityIcons name='pencil' size={23} color={AppColor.Grey}/>

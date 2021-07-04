@@ -26,7 +26,7 @@ export type AddressListQueryAppQuery = {|
 
 /*
 query AddressListQueryAppQuery(
-  $userID: ID!
+  $userID: String!
   $count: Int!
   $after: String
 ) {
@@ -38,7 +38,6 @@ fragment AddressList_address on Query {
     edges {
       node {
         id
-        previousApiId
         name
         firstLine
         secondLine
@@ -155,13 +154,6 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "previousApiId",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
                     "name": "name",
                     "storageKey": null
                   },
@@ -260,16 +252,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3af200b8cf2e4aed4c74350ecbaae485",
+    "cacheID": "4d16f1ecaaeefc7fdb12198f423aa4b3",
     "id": null,
     "metadata": {},
     "name": "AddressListQueryAppQuery",
     "operationKind": "query",
-    "text": "query AddressListQueryAppQuery(\n  $userID: ID!\n  $count: Int!\n  $after: String\n) {\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        previousApiId\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query AddressListQueryAppQuery(\n  $userID: String!\n  $count: Int!\n  $after: String\n) {\n  ...AddressList_address\n}\n\nfragment AddressList_address on Query {\n  getAddress(first: $count, after: $after, userId: $userID) {\n    edges {\n      node {\n        id\n        name\n        firstLine\n        secondLine\n        pinCode\n        phoneNumber\n        landMark\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '5cb362c83f838e31448d4f54f3c06211';
+(node/*: any*/).hash = 'b1dfaf5a89e8026f88dd3e404660b981';
 
 module.exports = node;

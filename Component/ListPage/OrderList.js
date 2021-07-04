@@ -1,30 +1,18 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { List, ListItem, Text, Icon } from "@ui-kitten/components";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, View, RefreshControl } from "react-native";
+import { List, ListItem, Text, Icon, Divider } from "@ui-kitten/components";
 import { AppColor } from "../Extras/Colors";
 import { createPaginationContainer, graphql } from "react-relay";
+import { usePaginationFragment, fetchQuery } from "react-relay/hooks";
+import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { PaginationLoader } from "../Extras/Loaders";
-
-function _loadMore(props) {
-  console.log(
-    "starting loading more",
-    props.relay.hasMore(),
-    props.relay.isLoading()
-  );
-  if (!props.relay.hasMore() || props.relay.isLoading()) {
-    return;
-  }
-  console.log("loading more");
-  props.relay.loadMore(
-    5, // Fetch the next 10 feed items
-    (error) => {
-      console.log(error);
-    }
-  );
-}
+import { Currency } from "../Extras/Constants";
+import GetCurrentOrderStatus from "../Extras/OrderStatus";
+import OrderListRefreshQuery from "../Order/__generated__/OrderAppQuery.graphql";
+import { SUCCESSIVE_PAGINATION_COUNT } from "../Extras/Constants";
 
 export default function OrderList(props) {
   const {
@@ -34,11 +22,78 @@ export default function OrderList(props) {
     onProductChange,
     onItemClick,
     onAddWishList,
+    userId,
     ...listItemProps
   } = props;
+  const [refreshing, setRefreshing] = useState(false);
+  function _loadMore() {
+    if (!hasNext || isLoadingNext) {
+      return;
+    }
+    loadNext(SUCCESSIVE_PAGINATION_COUNT);
+  }
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchQuery(RelayEnvironment, OrderListRefreshQuery, {
+      count: data.getUserOrderSet ? data.getUserOrderSet.edges.length : 0,
+      after: 0,
+      userId,
+    }).subscribe({
+      complete: () => {
+        setRefreshing(false);
+        refetch({}, { fetchPolicy: "store-only" });
+      },
+      error: (error) => {
+        let e = error;
+        console.log(error);
+        setRefreshing(false);
+      },
+    });
+  });
+
+  const renderFooter = () => {
+    if (hasNext) {
+      return <PaginationLoader />;
+    } else {
+      return <></>;
+    }
+  };
+
+  let { data, loadNext, refetch, hasNext, isLoadingNext } =
+    usePaginationFragment(
+      graphql`
+        fragment OrderList_orders on Query
+        @refetchable(queryName: "OrderListPaginationQuery") {
+          getUserOrderSet(first: $count, after: $after, userId: $userId)
+            @connection(key: "OrderList_getUserOrderSet", filters: []) {
+            edges {
+              node {
+                id
+                deliveredBy
+                orderDetails
+                totalAmount
+                paymentMode
+                status {
+                  payment
+                  confirmed
+                  delivered
+                }
+              }
+            }
+          }
+        }
+      `,
+      props.orders
+    );
   const zoomIconRef = React.useRef();
   const renderProductItem = (product) => {
     const productDetails = product.item.node;
+    const orderStatus = GetCurrentOrderStatus(
+      productDetails.status,
+      productDetails.paymentMode
+    );
+    console.log(orderStatus.text);
     return (
       <>
         <ListItem
@@ -46,7 +101,7 @@ export default function OrderList(props) {
           style={[styles.container, style]}
           key={productDetails.previousApiId}
           onPress={() => {
-            onItemClick(productDetails.previousApiId);
+            onItemClick(productDetails.id);
           }}
         >
           <View style={styles.detailsContainer}>
@@ -64,7 +119,18 @@ export default function OrderList(props) {
                     {"Total Price : "}
                   </Text>
                   <Text style={styles.discountPrice} category="h6">
-                    {`₹ ` + productDetails.totalAmount}
+                    {`${Currency} ` + productDetails.totalAmount}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                  <Text category="s1" appearance="hint">
+                    {"Status : "}
+                  </Text>
+                  <Text
+                    style={{ color: orderStatus.status, ...styles.orderStatus }}
+                    category="h6"
+                  >
+                    {orderStatus.text}
                   </Text>
                 </View>
                 <View style={{ flexDirection: "row" }}>
@@ -93,91 +159,103 @@ export default function OrderList(props) {
       </>
     );
   };
-  const WishListIconActive = (props) => (
-    <MaterialCommunityIcons name="heart" size={23} color="tomato" />
-  );
-  const WishListIconInactive = (style) => (
-    <MaterialCommunityIcons name="chevron-right" size={30} color="tomato" />
-  );
-  const addToWishList = (props) => {
-    // onAddWishList(product, index);
-  };
-  const updateIndex = (selectedIndex) => {
-    setAvailabilityIndex(selectedIndex);
-  };
-  const onItemPress = (e) => {
-    zoomIconRef.current.startAnimation();
-    onItemClick(e);
-  };
-  const renderFooter = () => {
-    if (props.relay.hasMore()) {
-      return <PaginationLoader />;
-    } else {
-      return <></>;
-    }
-  };
+
   return (
     <List
-      data={props.orders.getUserOrderSet.edges}
+      data={data.getUserOrderSet.edges}
       renderItem={renderProductItem}
+      ItemSeparatorComponent={Divider}
       onEndReachedThreshold={0.5}
       onEndReached={() => _loadMore(props)}
       ListFooterComponent={renderFooter}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     />
   );
 }
 
-module.exports = createPaginationContainer(
-  OrderList,
-  {
-    orders: graphql`
-      fragment OrderList_orders on Query {
-        getUserOrderSet(first: $count, after: $after, userId: $userId)
-          @connection(key: "OrderList_getUserOrderSet") {
-          edges {
-            node {
-              id
-              previousApiId
-              deliveredBy
-              orderDetails
-              totalAmount
-            }
-          }
-        }
-      }
-    `,
-  },
-  {
-    direction: "forward",
-    getConnectionFromProps(props) {
-      return props.orders && props.orders.getUserOrderSet;
-    },
-    // This is also the default implementation of `getFragmentVariables` if it isn't provided.
-    getFragmentVariables(prevVars, totalCount) {
-      return {
-        ...prevVars,
-        count: totalCount,
-      };
-    },
-    getVariables(props, { count, cursor }, fragmentVariables) {
-      return {
-        count: count,
-        after: props.orders.getUserOrderSet.pageInfo.endCursor,
-        userId: fragmentVariables.userId,
-        cursor,
-        // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
-        // userID: fragmentVariables.userID,
-      };
-    },
-    query: graphql`
-      # Pagination query to be fetched upon calling 'loadMore'.
-      # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
-      query OrderListQuery($count: Int!, $after: String, $userId: ID!) {
-        ...OrderList_orders
-      }
-    `,
-  }
-);
+// module.exports = usePaginationFragment(
+//   graphql`
+//       fragment OrderList_orders on Query {
+//         getUserOrderSet(first: $count, after: $after, userId: $userId)
+//           @connection(key: "OrderList_getUserOrderSet", filters: []) {
+//           edges {
+//             node {
+//               id
+//               deliveredBy
+//               orderDetails
+//               totalAmount
+//               paymentMode
+//               status {
+//                 payment
+//                 confirmed
+//                 delivered
+//               }
+//             }
+//           }
+//         }
+//       }
+//     `,
+//     props.orders
+// );
+
+// module.exports = createPaginationContainer(
+//   OrderList,
+//   {
+// orders: graphql`
+//   fragment OrderList_orders on Query {
+//     getUserOrderSet(first: $count, after: $after, userId: $userId)
+//       @connection(key: "OrderList_getUserOrderSet", filters: []) {
+//       edges {
+//         node {
+//           id
+//           deliveredBy
+//           orderDetails
+//           totalAmount
+//           paymentMode
+//           status {
+//             payment
+//             confirmed
+//             delivered
+//           }
+//         }
+//       }
+//     }
+//   }
+// `,
+//   },
+//   {
+//     direction: "forward",
+//     getConnectionFromProps(props) {
+//       return props.orders && props.orders.getUserOrderSet;
+//     },
+//     // This is also the default implementation of `getFragmentVariables` if it isn't provided.
+//     getFragmentVariables(prevVars, totalCount) {
+//       return {
+//         ...prevVars,
+//         count: totalCount,
+//       };
+//     },
+//     getVariables(props, { count, cursor }, fragmentVariables) {
+//       return {
+//         count: count,
+//         after: props.orders.getUserOrderSet.pageInfo.endCursor,
+//         userId: fragmentVariables.userId,
+//         cursor,
+//         // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
+//         // userID: fragmentVariables.userID,
+//       };
+//     },
+//     query: graphql`
+//       # Pagination query to be fetched upon calling 'loadMore'.
+//       # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
+//       query OrderListQuery($count: Int!, $after: String, $userId: String!) {
+//         ...OrderList_orders
+//       }
+//     `,
+//   }
+// );
 
 const styles = StyleSheet.create({
   container: {
@@ -218,6 +296,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
     fontWeight: "bold",
     fontSize: 18,
+  },
+  orderStatus: {
+    marginRight: 12,
+    fontWeight: "bold",
+    fontSize: 16,
   },
   discount: {
     color: "#00cc00",

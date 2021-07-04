@@ -10,13 +10,13 @@ export default function EditUserProfile({ route, navigation }) {
 
   const [firstName, setFirstName] = useState(userProfile.firstName)
   const [lastName, setLastName] = useState(userProfile.lastName)
-  const [email, setEmail] = useState(userProfile.email)
+  // const [email, setEmail] = useState(userProfile.email)
 
   const [firstNameInvalid, setFirstNameInvalid] = useState(userProfile.firstName.length > 0 ? "" :"danger");
-  const [emailInvalid, setEmailInvalid] = useState(userProfile.email.length > 0 ? "" :"danger");
+  // const [emailInvalid, setEmailInvalid] = useState(userProfile.email.length > 0 ? "" :"danger");
 
   const onUpdate = () => {
-    if(firstNameInvalid, emailInvalid === "danger") {
+    if(firstNameInvalid === "danger") {
       Alert.alert(
         "Please provide required details",
         "",
@@ -34,10 +34,10 @@ export default function EditUserProfile({ route, navigation }) {
         navigation.goBack();
       };
       UpdateProfile(
-        userProfile.previousApiId,
+        userProfile.id,
         firstName,
         lastName, 
-        email,
+        // email,
         callback
       )
     }
@@ -81,7 +81,7 @@ export default function EditUserProfile({ route, navigation }) {
               }
             />
           </View>
-          <View style={styles.inputContainer}>
+          {/* <View style={styles.inputContainer}>
             <Text category="s1" style={styles.text}>
               Email Address
             </Text>
@@ -99,7 +99,7 @@ export default function EditUserProfile({ route, navigation }) {
                 }
               }
             />
-          </View>
+          </View> */}
           <View style={styles.buttonContainer}>
             <Button
               onPress={onUpdate}

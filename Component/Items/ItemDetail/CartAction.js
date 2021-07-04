@@ -5,8 +5,8 @@ import { PlusIcon, MinusIcon } from "../../Extras/Icons";
 import { AppColor } from "../../Extras/Colors";
 
 export function CartAction(props) {
-  // const {quantity, setQuantity} = props;
-  const [quantity, setQuantity] = useState(1);
+  const {quantity, onPlusButtonPress, onMinusButtonPress , onAddToCart} = props;
+  // const [quantity, setQuantity] = useState(1);
   // let quantity = useRef(1);
   // const setQuantity = () => {
   //   quantity.current += 1;
@@ -15,12 +15,12 @@ export function CartAction(props) {
   const decrementButtonEnabled = () => {
     return quantity > 1;
   };
-  const onMinusButtonPress = () => {
-    setQuantity(quantity - 1);
-  };
-  const onPlusButtonPress = () => {
-    setQuantity(quantity + 1);
-  };
+  // const onMinusButtonPress = () => {
+  //   setQuantity(quantity - 1);
+  // };
+  // const onPlusButtonPress = () => {
+  //   setQuantity(quantity + 1);
+  // };
   return (
     <View style={styles.actionContainer}>
       <View style={styles.incrementDecrementContainer}>
@@ -57,7 +57,7 @@ export function CartAction(props) {
         style={styles.actionButton}
         size="large"
         activeOpacity={0.8}
-        // onPress={onBuyButtonPress}
+        onPress={onAddToCart}
       >
         ADD TO CART
       </Button>
@@ -66,24 +66,18 @@ export function CartAction(props) {
 }
 
 export function CartActionMini(props) {
-  // const {quantity, setQuantity} = props;
-  const [quantity, setQuantity] = useState(1);
-  // let quantity = useRef(1);
-  // const setQuantity = () => {
-  //   quantity.current += 1;
-  // }
-
+  const {quantity, onPlusButtonPress, onMinusButtonPress} = props;
   const decrementButtonEnabled = () => {
     return quantity > 1;
   };
-  const onMinusButtonPress = () => {
-    console.log("button press");
-    setQuantity(quantity - 1);
-  };
-  const onPlusButtonPress = () => {
-    console.log("button press");
-    setQuantity(quantity + 1);
-  };
+  // const onMinusButtonPress = () => {
+  //   console.log("button press");
+  //   setQuantity(quantity - 1);
+  // };
+  // const onPlusButtonPress = () => {
+  //   console.log("button press");
+  //   setQuantity(quantity + 1);
+  // };
   return (
       <View style={styles.incrementDecrementContainerMini}>
         <Button
@@ -120,7 +114,7 @@ export function CartActionMini(props) {
 
 const styles = StyleSheet.create({
   actionContainer: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     backgroundColor: AppColor.White,
     margin: 5,
     marginHorizontal: 10,
@@ -148,6 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     right: 0,
     bottom: 6,
+    marginHorizontal: 16
   },
   incrementDecrementContainerMini: {
     flexDirection: "row"

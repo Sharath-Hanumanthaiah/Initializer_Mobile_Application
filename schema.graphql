@@ -3,14 +3,13 @@ directive @defer on FIELD
 
 type Address {
   firstLine: String
-  id: ID!
+  id: String!
   landMark: String
   name: String
   phoneNumber: String
   pinCode: String
-  previousApiId: ID!
   secondLine: String
-  userId: ID
+  userId: String!
 }
 
 type AddressConnection {
@@ -25,33 +24,50 @@ type AddressConnectionEdge {
 
 input AddressInput {
   firstLine: String
+  id: String
   landMark: String
   name: String!
   phoneNumber: String!
   pinCode: String
-  previousApiId: ID
   secondLine: String
-  userId: ID!
+  userId: String!
 }
 
 type AddressOutput {
   address: Address
 }
 
-type CompositeKey {
-  itemId: ID
-  userId: ID
+input CompositeKeyCartInput {
+  availabilityId: String
+  itemId: String
+  userId: String
+}
+
+input CreateOrderInput {
+  addressId: String!
+  coupenCode: String
+  orderId: String
+  paymentMode: String!
+  userId: String!
+}
+
+type CreateOrderOutput {
+  deliveredBy: Date
+  orderId: String!
+  paymentMetadata: PaymentMetadata
+  paymentMode: String
+  status: OrderStatus
+  totalAmount: Float
 }
 
 scalar Date
 
 type HomePage {
   content: [HomePageContent]
-  id: ID!
+  id: String!
   itemType: String!
   name: String
-  previousApiId: ID!
-  typeId: ID
+  typeId: String
   widget: String!
 }
 
@@ -67,11 +83,10 @@ type HomePageConnectionEdge {
 
 type HomePageContent {
   description: String
-  id: ID!
+  id: String!
   imageLink: String
   name: String
   offer: String
-  previousApiId: String!
 }
 
 type ItemAvailability {
@@ -79,19 +94,18 @@ type ItemAvailability {
   available: String
   discount: Long
   discountPrice: Float
-  id: ID!
-  itemId: ID!
+  id: String!
+  itemId: String!
   unit: String
   value: Float
 }
 
 type ItemCategory {
   description: String
-  id: ID!
+  id: String!
   imageLink: String
   name: String
   offer: String
-  previousApiId: String!
 }
 
 type ItemCategoryConnection {
@@ -112,17 +126,16 @@ type ItemDescription {
 
 type ItemDetails {
   averageRating: Float
-  categoryId: ID
+  categoryId: String
   description: ItemDescription
-  id: ID!
+  id: String!
   imageLink: String
   imageLinks: [String]
   isWishlist: Boolean
   itemAvailability: [ItemAvailability]
   name: String
-  previousApiId: ID!
   status: String
-  subCategoryId: ID
+  subCategoryId: String
 }
 
 type ItemDetailsConnection {
@@ -136,13 +149,12 @@ type ItemDetailsConnectionEdge {
 }
 
 type ItemSubCategory {
-  categoryId: ID
+  categoryId: String
   description: String
-  id: ID!
+  id: String!
   imageLink: String
   name: String
   offer: String
-  previousApiId: String!
 }
 
 type ItemSubCategoryConnection {
@@ -159,8 +171,11 @@ type ItemSubCategoryConnectionEdge {
 scalar Long
 
 type Mutation {
-  addItemReview(itemId: ID!, rating: Int, review: String, userId: ID!): UserReview
-  deleteAddress(id: ID!): Boolean
+  addItemReview(itemId: String!, rating: Int, review: String, userId: String!): UserReviewOutput
+  addUserCart(input: UserCartInput!): UserCartList
+  changeWishList(input: UserWishListInput!): Boolean
+  createOrderFromCart(input: CreateOrderInput): CreateOrderOutput!
+  deleteAddress(id: String!): Boolean
   updateUser(input: UserDetailsInput!): UserDetailsOutput
   upsertAddress(input: AddressInput!): AddressOutput
 }
@@ -168,6 +183,7 @@ type Mutation {
 type OrderStatus {
   confirmed: Boolean
   delivered: Boolean
+  payment: String
 }
 
 type PageInfo {
@@ -177,37 +193,71 @@ type PageInfo {
   startCursor: String
 }
 
+type PaymentMetadata {
+  externalOrderId: String
+  gatewayName: String
+  orderId: String!
+  publicKey: String
+  secretKey: String
+}
+
 type Query {
-  getAddress(after: String, first: Int, userId: ID): AddressConnection
+  checkOut: String
+  getAddress(after: String, first: Int, userId: String): AddressConnection
   getHomePage(after: String, first: Int): HomePageConnection
   getItemCategory(after: String, first: Int): ItemCategoryConnection
-  getItemCategoryContentById(after: String, categoryId: ID, first: Int): ItemCategoryConnection
-  getItemCategoryContentByIdTemp(categoryId: ID): [ItemCategory!]!
-  getItemDetails(after: String, first: Int, itemType: String, typeId: ID): ItemDetailsConnection
-  getItemDetailsById(itemId: ID!, userId: ID!): ItemDetails
-  getItemReview(after: String, first: Int, itemId: ID!): UserReviewConnection
-  getItemSubCategoryByCategoryId(after: String, categoryId: ID, first: Int): ItemSubCategoryConnection
-  getUserById(id: ID!): UserDetails
-  getUserOrderById(orderId: ID!): UserOrderSet
-  getUserOrderSet(after: String, first: Int, userId: ID!): UserOrderSetConnection
-  getUserWishList(after: String, first: Int, userId: ID): ItemDetailsConnection
+  getItemCategoryContentById(after: String, categoryId: String, first: Int): ItemCategoryConnection
+  getItemDetails(after: String, first: Int, itemType: String, typeId: String, userId: String): ItemDetailsConnection
+  getItemDetailsById(itemId: String!, userId: String): ItemDetails
+  getItemReview(after: String, first: Int, itemId: String!): UserReviewConnection
+  getItemSubCategoryByCategoryId(after: String, categoryId: String, first: Int): ItemSubCategoryConnection
+  getUserById(id: String!): UserDetails
+  getUserCart(after: String, first: Int, userId: String!): UserCartListConnection
+  getUserOrderById(orderId: String!): UserOrderSet
+  getUserOrderSet(after: String, first: Int, userId: String!): UserOrderSetConnection
+  getUserWishList(after: String, first: Int, userId: String): ItemDetailsConnection
+}
+
+input UserCartInput {
+  id: CompositeKeyCartInput
+  quantity: Float
+}
+
+type UserCartList {
+  availabilityId: String
+  discountPrice: Float
+  id: String!
+  imageLink: String
+  itemId: String
+  itemName: String
+  quantity: Float
+  unit: String
+  userId: String
+  value: Float
+}
+
+type UserCartListConnection {
+  edges: [UserCartListConnectionEdge]
+  pageInfo: PageInfo
+}
+
+type UserCartListConnectionEdge {
+  cursor: String
+  node: UserCartList
 }
 
 type UserDetails {
   email: String
   firstName: String
-  id: ID!
+  id: String!
   lastName: String
-  password: String
-  previousApiId: ID!
   status: String
 }
 
 input UserDetailsInput {
-  email: String
   firstName: String
+  id: String!
   lastName: String
-  previousApiId: ID!
 }
 
 type UserDetailsOutput {
@@ -216,30 +266,31 @@ type UserDetailsOutput {
 
 type UserOrder {
   amount: Float
-  availabilityId: ID
+  availabilityId: String
   imageLink: String
-  itemId: ID!
+  itemId: String!
   itemName: String
-  quantity: ID
+  quantity: Float
   unit: String
-  userId: ID!
+  value: Float
 }
 
 type UserOrderSet {
   addressDetails: Address
-  addressId: ID
+  addressId: String
   coupenCode: String
   coupenDiscount: Float
   deliveredBy: Date
   deliveryCharge: Float
-  id: ID!
+  id: String!
   netAmount: Float
   orderAt: Date
   orderDetails: String
   orderList: [UserOrder]
-  previousApiId: ID!
+  paymentMode: String
   status: OrderStatus
   totalAmount: Float
+  userId: String!
 }
 
 type UserOrderSetConnection {
@@ -252,15 +303,6 @@ type UserOrderSetConnectionEdge {
   node: UserOrderSet
 }
 
-type UserReview {
-  changedAt: Date
-  id: String
-  previousApiId: CompositeKey
-  rating: Int
-  review: String
-  userName: String
-}
-
 type UserReviewConnection {
   edges: [UserReviewConnectionEdge]
   pageInfo: PageInfo
@@ -268,6 +310,22 @@ type UserReviewConnection {
 
 type UserReviewConnectionEdge {
   cursor: String
-  node: UserReview
+  node: UserReviewOutput
+}
+
+type UserReviewOutput {
+  changedAt: Date
+  id: String!
+  itemId: String
+  rating: Int
+  review: String
+  userId: String
+  userName: String
+}
+
+input UserWishListInput {
+  itemId: String!
+  type: String
+  userId: String!
 }
 

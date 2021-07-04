@@ -14,7 +14,6 @@ declare export opaque type ItemDetail_item$fragmentType: ItemDetail_item$ref;
 export type ItemDetail_item = {|
   +getItemDetailsById: ?{|
     +id: string,
-    +previousApiId: string,
     +name: ?string,
     +itemAvailability: ?$ReadOnlyArray<?{|
       +id: string,
@@ -87,13 +86,6 @@ return {
       "plural": false,
       "selections": [
         (v0/*: any*/),
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "previousApiId",
-          "storageKey": null
-        },
         {
           "alias": null,
           "args": null,
@@ -210,6 +202,6 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '12d4ea60330437f437797a5fdeb7ebd1';
+(node/*: any*/).hash = '848192f77007d810ba4941b701c53336';
 
 module.exports = node;

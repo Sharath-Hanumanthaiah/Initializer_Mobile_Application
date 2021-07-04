@@ -13,7 +13,6 @@ declare export opaque type ItemListItem_item$ref: FragmentReference;
 declare export opaque type ItemListItem_item$fragmentType: ItemListItem_item$ref;
 export type ItemListItem_item = {|
   +id: string,
-  +previousApiId: string,
   +name: ?string,
   +imageLink: ?string,
   +isWishlist: ?boolean,
@@ -46,13 +45,6 @@ const node/*: ReaderFragment*/ = {
       "args": null,
       "kind": "ScalarField",
       "name": "id",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "previousApiId",
       "storageKey": null
     },
     {
@@ -127,6 +119,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = '4064bf4fdc8d8810184b36e44a6d506f';
+(node/*: any*/).hash = '7fdb1df0c40c58feb5acc8ce090f7b4c';
 
 module.exports = node;

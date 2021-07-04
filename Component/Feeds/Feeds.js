@@ -1,35 +1,87 @@
 import React from "react";
 
-import { StyleSheet, View } from "react-native";
-import { Card, List, Text, Divider } from "@ui-kitten/components";
-import { createPaginationContainer, graphql } from "react-relay";
+import { StyleSheet, RefreshControl } from "react-native";
+import { List } from "@ui-kitten/components";
+import { graphql } from "react-relay";
+import { usePaginationFragment, fetchQuery } from "react-relay/hooks";
+import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 
 import RenderCard from "../Carousel/RenderCard";
 import { PaginationLoader } from "../Extras/Loaders";
+import { SUCCESSIVE_PAGINATION_COUNT } from "../Extras/Constants";
 
-function _loadMore(props) {
-  if (!props.relay.hasMore() || props.relay.isLoading()) {
-    return;
-  }
-  props.relay.loadMore(
-    4, // Fetch the next 5 feed items
-    (error) => {
-      console.log(error);
-    }
-  );
-}
+import FeedsContainerRefetch from "./__generated__/FeedsContainerAppQuery.graphql";
 
 export default function Feeds(props) {
+  const [refreshing, setRefreshing] = React.useState(false);
+  function _loadMore() {
+    console.log("loadmore", hasNext, isLoadingNext);
+    if (!hasNext || isLoadingNext) {
+      return;
+    }
+    loadNext(SUCCESSIVE_PAGINATION_COUNT);
+  }
+
+  let {
+    data,
+    loadNext,
+    refetch,
+    hasNext,
+    isLoadingNext,
+  } = usePaginationFragment(
+    graphql`
+      fragment Feeds_feed on Query
+      @refetchable(queryName: "FeedgetHomePageRefetchQuery") {
+        getHomePage(first: $count, after: $after)
+          @connection(key: "Feed_getHomePage") {
+          edges {
+            node {
+              id
+              itemType
+              name
+              typeId
+              widget
+              ...RenderCard_item
+            }
+          }
+        }
+      }
+    `,
+    props.feed
+  );
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchQuery(RelayEnvironment, FeedsContainerRefetch, {
+      count: data.getHomePage ? data.getHomePage.edges.length : 0,
+      after: 0,
+    }).subscribe({
+      complete: () => {
+        setRefreshing(false);
+        refetch({}, { fetchPolicy: "store-only" });
+      },
+      error: (error) => {
+        let e = error;
+        console.log(error);
+        setRefreshing(false);
+      },
+    });
+  });
+
   const onItemPress = (event) => {
+    console.log("item pressss", event);
     if (event.itemType === "ItemDetails") {
-      props.navigation.navigate("ItemList", {
-        screen: "Details",
-        params: { typeId: event.typeId },
+      props.navigation.navigate("Details", {
+        typeId: event.typeId
+        // screen: "Details",
+        // params: { typeId: event.typeId },
       });
     } else {
-      props.navigation.navigate("ItemList", {
-        screen: "ItemList",
-        params: { itemType: event.itemType, typeId: event.typeId },
+      props.navigation.navigate("Items", {
+        itemType: event.itemType, 
+        typeId: event.typeId
+        // screen: "ItemList",
+        // params: { itemType: event.itemType, typeId: event.typeId },
       });
     }
   };
@@ -37,7 +89,7 @@ export default function Feeds(props) {
     return <RenderCard item={item.node} onItemPress={onItemPress} />;
   };
   const renderFooter = () => {
-    if (props.relay.hasMore()) {
+    if (hasNext) {
       return <PaginationLoader />;
     } else {
       return <></>;
@@ -47,69 +99,19 @@ export default function Feeds(props) {
     <List
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
-      data={props.feed.getHomePage.edges}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      data={data.getHomePage? data.getHomePage.edges: []}
       renderItem={renderItem}
       onEndReachedThreshold={0.5}
-      onEndReached={() => _loadMore(props)}
+      onEndReached={() => _loadMore()}
       ListFooterComponent={renderFooter}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     />
   );
 }
-
-module.exports = createPaginationContainer(
-  Feeds,
-  {
-    feed: graphql`
-      fragment Feeds_feed on Query {
-        getHomePage(first: $count, after: $after)
-          @connection(key: "Feed_getHomePage") {
-          edges {
-            node {
-              id
-              itemType
-              name
-              previousApiId
-              typeId
-              widget
-              ...RenderCard_item
-            }
-          }
-        }
-      }
-    `,
-  },
-  {
-    direction: "forward",
-    getConnectionFromProps(props) {
-      return props.feed && props.feed.getHomePage;
-    },
-    // This is also the default implementation of `getFragmentVariables` if it isn't provided.
-    getFragmentVariables(prevVars, totalCount) {
-      return {
-        ...prevVars,
-        count: totalCount,
-        categoryId: 1,
-      };
-    },
-    getVariables(props, { count, cursor }, fragmentVariables) {
-      return {
-        count: count,
-        after: props.feed.getHomePage.pageInfo.endCursor,
-        // catagoryId: null,
-        cursor,
-        // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
-        // userID: fragmentVariables.userID,
-      };
-    },
-    query: graphql`
-      # Pagination query to be fetched upon calling 'loadMore'.
-      # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
-      query FeedsListQuery($count: Int!, $after: String) {
-        ...Feeds_feed
-      }
-    `,
-  }
-);
 
 const styles = StyleSheet.create({
   container: {

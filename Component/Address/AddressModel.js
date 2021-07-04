@@ -6,7 +6,7 @@ import { MutationPageLoader } from "../Extras/Loaders";
 // import {PlusIcon, MinusIcon} from '../../Extras/Icons';
 // import {AppColor} from '../../Extras/Colors';
 export default function AddressModel({ route, navigation }) {
-  const { address } = route.params;
+  const { address, userId } = route.params;
   const [name, setName] = useState(address.name);
   const [phoneNumber, setPhoneNumber] = useState(address.phoneNumber);
   const [firstLine, setFirstLine] = useState(address.firstLine);
@@ -37,7 +37,6 @@ export default function AddressModel({ route, navigation }) {
       );
     }else {
       setDisabled(true);
-      const userId = 1;
       const callback = () => {
         navigation.goBack();
       };
@@ -49,7 +48,6 @@ export default function AddressModel({ route, navigation }) {
         secondLine,
         landMark,
         pinCode,
-        address.previousApiId,
         address.id,
         callback
       );

@@ -42,7 +42,7 @@ export default function MultiItemCard(props) {
               })
             }
             onPress={() =>
-              onItemPress({ itemType: itemType, typeId: item.previousApiId })
+              onItemPress({ itemType: itemType, typeId: item.id })
             }
           >
             <Text category="s1" style={styles.itemFooter} numberOfLines={2}>

@@ -16,10 +16,15 @@ export type OrderList_orders = {|
     +edges: ?$ReadOnlyArray<?{|
       +node: ?{|
         +id: string,
-        +previousApiId: string,
         +deliveredBy: ?any,
         +orderDetails: ?string,
         +totalAmount: ?number,
+        +paymentMode: ?string,
+        +status: ?{|
+          +payment: ?string,
+          +confirmed: ?boolean,
+          +delivered: ?boolean,
+        |},
       |}
     |}>
   |},
@@ -34,7 +39,11 @@ export type OrderList_orders$key = {
 */
 
 
-const node/*: ReaderFragment*/ = {
+const node/*: ReaderFragment*/ = (function(){
+var v0 = [
+  "getUserOrderSet"
+];
+return {
   "argumentDefinitions": [
     {
       "kind": "RootArgument",
@@ -56,23 +65,27 @@ const node/*: ReaderFragment*/ = {
         "count": "count",
         "cursor": "after",
         "direction": "forward",
-        "path": [
-          "getUserOrderSet"
-        ]
+        "path": (v0/*: any*/)
       }
-    ]
+    ],
+    "refetch": {
+      "connection": {
+        "forward": {
+          "count": "count",
+          "cursor": "after"
+        },
+        "backward": null,
+        "path": (v0/*: any*/)
+      },
+      "fragmentPathInResult": [],
+      "operation": require('./OrderListPaginationQuery.graphql.js')
+    }
   },
   "name": "OrderList_orders",
   "selections": [
     {
       "alias": "getUserOrderSet",
-      "args": [
-        {
-          "kind": "Variable",
-          "name": "userId",
-          "variableName": "userId"
-        }
-      ],
+      "args": null,
       "concreteType": "UserOrderSetConnection",
       "kind": "LinkedField",
       "name": "__OrderList_getUserOrderSet_connection",
@@ -105,13 +118,6 @@ const node/*: ReaderFragment*/ = {
                   "alias": null,
                   "args": null,
                   "kind": "ScalarField",
-                  "name": "previousApiId",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
                   "name": "deliveredBy",
                   "storageKey": null
                 },
@@ -127,6 +133,45 @@ const node/*: ReaderFragment*/ = {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "totalAmount",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "paymentMode",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "concreteType": "OrderStatus",
+                  "kind": "LinkedField",
+                  "name": "status",
+                  "plural": false,
+                  "selections": [
+                    {
+                      "alias": null,
+                      "args": null,
+                      "kind": "ScalarField",
+                      "name": "payment",
+                      "storageKey": null
+                    },
+                    {
+                      "alias": null,
+                      "args": null,
+                      "kind": "ScalarField",
+                      "name": "confirmed",
+                      "storageKey": null
+                    },
+                    {
+                      "alias": null,
+                      "args": null,
+                      "kind": "ScalarField",
+                      "name": "delivered",
+                      "storageKey": null
+                    }
+                  ],
                   "storageKey": null
                 },
                 {
@@ -181,7 +226,8 @@ const node/*: ReaderFragment*/ = {
   "type": "Query",
   "abstractKey": null
 };
+})();
 // prettier-ignore
-(node/*: any*/).hash = 'a203a333f4eae7bd384ca3e6db37b051';
+(node/*: any*/).hash = 'd71446d8f6192dc20577de427ad6c0b7';
 
 module.exports = node;

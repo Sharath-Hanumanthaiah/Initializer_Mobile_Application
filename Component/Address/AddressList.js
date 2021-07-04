@@ -7,15 +7,15 @@ import {
   Text,
   ListItem,
   Button,
-  Modal, 
-  Card
+  Modal,
+  Card,
 } from "@ui-kitten/components";
 import { createPaginationContainer, graphql } from "react-relay";
 
 import { PaginationLoader } from "../Extras/Loaders";
 import { FormEdit, Delete } from "../Extras/Icons";
-import DeleteAddress from '../Mutation/AddressDeleteMutation';
-import Address from './Address';
+import DeleteAddress from "../Mutation/AddressDeleteMutation";
+import Address from "./Address";
 import { add } from "react-native-reanimated";
 
 function _loadMore(props) {
@@ -37,39 +37,56 @@ function _loadMore(props) {
 }
 
 function AddressList(props) {
+  const{userId} = props;
   const openAddressModel = () => {
-    let address = new Address()
+    let address = new Address();
     props.navigation.navigate("AddressModel", {
-      address: address
+      address: address,
+      userId: userId
     });
   };
   const onAddressEdit = (info) => {
-    let address = new Address()
-    address.id = info.id
-    address.previousApiId = info.previousApiId
-    address.name = info.name
-    address.firstLine = info.firstLine
-    address.secondLine = info.secondLine
-    address.pinCode = info.pinCode
-    address.landMark = info.landMark
-    address.phoneNumber = info.phoneNumber
-    
+    let address = new Address();
+    address.id = info.id;
+    address.name = info.name;
+    address.firstLine = info.firstLine;
+    address.secondLine = info.secondLine;
+    address.pinCode = info.pinCode;
+    address.landMark = info.landMark;
+    address.phoneNumber = info.phoneNumber;
+
     props.navigation.navigate("AddressModel", {
-      address: address
+      address: address,
+      userId: userId
     });
   };
   const onAddressDelete = (info) => {
-    console.log(info)
-    DeleteAddress(
-      info.id,
-      info.previousApiId
-    )
+    console.log(info);
+    DeleteAddress(info.id);
   };
+  const onAddressClick = (info) => {
+    let address = new Address();
+    address.id = info.id;
+    address.previousApiId = info.previousApiId;
+    address.name = info.name;
+    address.firstLine = info.firstLine;
+    address.secondLine = info.secondLine;
+    address.pinCode = info.pinCode;
+    address.landMark = info.landMark;
+    address.phoneNumber = info.phoneNumber;
+
+    props.callBack(address)
+  }
 
   const renderAddressItem = ({ item }) => {
     return (
       <React.Fragment>
-        <ListItem key={item.node.id} style={styles.itemContainer}>
+        <ListItem
+          key={item.node.id}
+          style={styles.itemContainer}
+          disabled={props.callBack ? false : true}
+          onPress={() => onAddressClick(item.node)}
+        >
           <View style={styles.marginVertical_8}>
             <View style={{ display: "flex", flexDirection: "column" }}>
               <Text category="s1" style={styles.secondHeadingBold}>
@@ -103,10 +120,12 @@ function AddressList(props) {
         <Button
           style={{ position: "absolute", bottom: 0, right: 0 }}
           appearance="ghost"
-          onPress={() => onAddressDelete({
-            id: item.node.id,
-            previousApiId: item.node.previousApiId
-          })}
+          onPress={() =>
+            onAddressDelete({
+              id: item.node.id,
+              previousApiId: item.node.previousApiId,
+            })
+          }
           accessoryLeft={Delete}
         />
         <Button
@@ -177,7 +196,6 @@ module.exports = createPaginationContainer(
           edges {
             node {
               id
-              previousApiId
               name
               firstLine
               secondLine

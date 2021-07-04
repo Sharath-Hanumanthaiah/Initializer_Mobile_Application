@@ -33,7 +33,7 @@ export default function ItemCard(props) {
           })
         }
         onPress={() =>
-          onItemPress({ itemType: itemType, typeId: item.previousApiId })
+          onItemPress({ itemType: itemType, typeId: item.id })
         }
       >
         <View style={{ flexDirection: "column", margin: -10 }}>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   itemHeader: {
-    height: 90,
+    height: 90
   },
   productItem: {
     flex: 1,

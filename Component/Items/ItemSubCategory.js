@@ -38,7 +38,7 @@ function ItemSubCategory(props) {
           offer: item.node.offer,
         })
       }
-        onPress={() => onItemPress({ itemType: "ItemSubCategory", typeId: item.node.previousApiId })}
+        onPress={() => onItemPress({ itemType: "ItemSubCategory", typeId: item.node.id })}
     >
       <Text
         category="s1"
@@ -85,7 +85,6 @@ module.exports = createPaginationContainer(
             cursor
             node {
               id
-              previousApiId
               name
               offer
               imageLink

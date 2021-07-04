@@ -38,7 +38,6 @@ fragment Feeds_feed on Query {
         id
         itemType
         name
-        previousApiId
         typeId
         widget
         ...RenderCard_item
@@ -60,7 +59,6 @@ fragment RenderCard_item on HomePage {
   typeId
   content {
     id
-    previousApiId
     name
     offer
     imageLink
@@ -103,13 +101,6 @@ v4 = {
   "args": null,
   "kind": "ScalarField",
   "name": "name",
-  "storageKey": null
-},
-v5 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "previousApiId",
   "storageKey": null
 };
 return {
@@ -173,7 +164,6 @@ return {
                     "storageKey": null
                   },
                   (v4/*: any*/),
-                  (v5/*: any*/),
                   {
                     "alias": null,
                     "args": null,
@@ -197,7 +187,6 @@ return {
                     "plural": true,
                     "selections": [
                       (v3/*: any*/),
-                      (v5/*: any*/),
                       (v4/*: any*/),
                       {
                         "alias": null,
@@ -276,12 +265,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "908bdb074d3a6f60a3c8c43e61274ee3",
+    "cacheID": "382e5c9480d5ae725038d3dd11ce9baf",
     "id": null,
     "metadata": {},
     "name": "FeedsContainerAppQuery",
     "operationKind": "query",
-    "text": "query FeedsContainerAppQuery(\n  $count: Int!\n  $after: String\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        previousApiId\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  itemType\n  typeId\n  content {\n    id\n    previousApiId\n    name\n    offer\n    imageLink\n  }\n}\n"
+    "text": "query FeedsContainerAppQuery(\n  $count: Int!\n  $after: String\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  itemType\n  typeId\n  content {\n    id\n    name\n    offer\n    imageLink\n  }\n}\n"
   }
 };
 })();

@@ -35,11 +35,11 @@ export default function Headera(props) {
             </Text>
           )}
         </View>
-        <View style={{flex: 1}}>
+        {/* <View style={{flex: 1}}>
           <Text category='h6' style={styles.textContainer}>
             {title === undefined? '': title}
             </Text>
-        </View>
+        </View> */}
         {/* <Layout style={styles.layout_searchBar}> */}
         {/* <SearchBar 
         placeholder="Search" 
@@ -65,7 +65,8 @@ export default function Headera(props) {
     header_layout: {
       flex: 1,
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
+      marginLeft: 5,
       backgroundColor: AppColor.AppColorVibrant,
     },
     layout_company_info: {

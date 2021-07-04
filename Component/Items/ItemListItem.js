@@ -1,36 +1,26 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import {
-  Button,
-  ListItem,
-  ListItemProps,
-  Text,
-  Select,
-  SelectItem,
-  IndexPath,
-} from "@ui-kitten/components";
-import { ButtonGroup } from "react-native-elements";
+import { Image, StyleSheet, View, Platform } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
+import { Button, ListItem, Text, IndexPath } from "@ui-kitten/components";
 
 import { createFragmentContainer, graphql } from "react-relay";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ChangeWishlist from "../Mutation/UserWishListMutation";
+import { Currency } from "../Extras/Constants";
+// import { _userData } from '../Extras/UserData';
 
 function ItemListItem(props) {
-  const index = props.item.previousApiId;
-  const [selectedIndex, setSelectedIndex] = React.useState(new IndexPath(0));
   const product = props.item;
   const {
     style,
     onProductChange,
     onItemPress,
     onAddWishList,
+    userId,
     ...listItemProps
   } = props;
   const [availabilityIndex, setAvailabilityIndex] = useState(0);
-  const buttons = product.itemAvailability.map((e) => {
-    return `${e.value} ${e.unit}`;
-  });
   const WishListIconActive = (props) => (
     <MaterialCommunityIcons name="heart" size={23} color="tomato" />
   );
@@ -38,16 +28,20 @@ function ItemListItem(props) {
     <MaterialCommunityIcons name="heart-outline" size={23} color="tomato" />
   );
   const addToWishList = (props) => {
-    // onAddWishList(product, index);
-  };
-  const updateIndex = (selectedIndex) => {
-    setAvailabilityIndex(selectedIndex);
+    const callback = () => {};
+    ChangeWishlist(
+      props.id,
+      props.userId,
+      props.previousApiId,
+      props.type,
+      callback
+    );
   };
   return (
     <ListItem
       key={product.id}
       onPress={() =>
-        onItemPress({ itemType: "ItemDetails", typeId: product.previousApiId })
+        onItemPress({ itemType: "ItemDetails", typeId: product.id })
       }
       {...listItemProps}
       style={[styles.container, style]}
@@ -58,51 +52,23 @@ function ItemListItem(props) {
           <Text category="h6" style={{}}>
             {product.name}
           </Text>
-          {/* <Text
-              appearance='hint'
-              category='p2'>
-              {product.subtitle}
-            </Text> */}
         </View>
-        {/* <ButtonGroup
-          onPress={updateIndex}
-          selectedIndex={availabilityIndex}
-          buttons={buttons}
-          containerStyle={styles.availablityContainer}
-          textStyle={{ fontSize: 13, color: "#8c8c8c" }}
-          selectedTextStyle={{ fontSize: 13, color: "#f77a55" }}
-          buttonStyle={{ width: 60, borderRadius: 10 }}
-          innerBorderStyle={{ color: "#fff" }}
-          selectedButtonStyle={{
-            backgroundColor: "#fff",
-            borderColor: "#f77a55",
-            borderWidth: 1,
-            padding: 6,
-            borderRadius: 10,
+        <RNPickerSelect
+          onValueChange={(value, index) => {
+            setAvailabilityIndex(index);
           }}
-        /> */}
-        <View>
-          {/* <Select
-            selectedIndex={selectedIndex}
-            onSelect={(index) => setSelectedIndex(index)}
-          >
-            {
-              product.itemAvailability.map((e) => {
-                return (<SelectItem title={`${e.value} ${e.unit}`} />);
-              })
-            }
-          </Select> */}
-          {/* <Picker
-            selectedValue={'java'}
-            style={{ height: 50, width: 100 }}
-            // onValueChange={(itemValue, itemIndex) =>
-            //   this.setState({ language: itemValue })
-            // }
-          >
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
-          </Picker> */}
-        </View>
+          placeholder={{}}
+          style={{
+            inputIOSContainer: { marginLeft: 12, margin: 12 },
+            inputIOS: { fontSize: 16, fontWeight: "500" },
+          }}
+          items={product.itemAvailability.map((value, index) => {
+            return {
+              label: `${value.value} ${value.unit}`,
+              value: `${value.value} ${value.unit}`,
+            };
+          })}
+        />
         {product.itemAvailability[availabilityIndex] !== undefined ? (
           <>
             <Text category="s2" style={styles.discount}>
@@ -112,10 +78,10 @@ function ItemListItem(props) {
             </Text>
             <View style={styles.amountContainer}>
               <Text style={styles.discountPrice} category="h6">
-                {`₹ ${product.itemAvailability[availabilityIndex].discountPrice}`}
+                {`${Currency} ${product.itemAvailability[availabilityIndex].discountPrice}`}
               </Text>
               <Text style={styles.actualPrice} category="s2">
-                {`₹ ${product.itemAvailability[availabilityIndex].actualPrice}`}
+                {`${Currency} ${product.itemAvailability[availabilityIndex].actualPrice}`}
               </Text>
             </View>
           </>
@@ -130,7 +96,14 @@ function ItemListItem(props) {
         accessoryLeft={
           product.isWishlist ? WishListIconActive : WishListIconInactive
         }
-        onPress={addToWishList}
+        onPress={() =>
+          addToWishList({
+            id: product.id,
+            userId: userId,
+            previousApiId: product.previousApiId,
+            type: product.isWishlist ? "remove" : "add",
+          })
+        }
       />
     </ListItem>
   );
@@ -141,7 +114,6 @@ export default createFragmentContainer(ItemListItem, {
     # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
     fragment ItemListItem_item on ItemDetails {
       id
-      previousApiId
       name
       imageLink
       isWishlist
@@ -169,13 +141,14 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 10,
     alignSelf: "flex-start",
+    resizeMode: "center",
   },
   detailsContainer: {
     flex: 1,
     height: "100%",
     flexDirection: "column",
     marginLeft: 16,
-    marginTop: 2,
+    marginTop: 10,
     overflow: "hidden",
   },
   amountContainer: {
@@ -214,11 +187,6 @@ const styles = StyleSheet.create({
   availablityContainer: {
     flexDirection: "row",
     height: "auto",
-    // width: 'auto',
-    // alignSelf: 'flex-start',
-    // justifyContent:'flex-start',
-    // alignContent: 'flex-start',
-    // flexWrap: 'wrap',
     flexShrink: 1,
     borderColor: "#fff",
     backgroundColor: "#fff",

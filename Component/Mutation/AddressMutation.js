@@ -7,7 +7,6 @@ const mutation = graphql`
     upsertAddress(input: $input) {
       address {
         id
-        previousApiId
         name
         phoneNumber
         firstLine
@@ -28,7 +27,6 @@ export default (
   secondLine,
   landMark,
   pinCode,
-  previousApiId,
   id,
   callback
 ) => {
@@ -38,7 +36,7 @@ export default (
       userId,
       name,
       phoneNumber,
-      previousApiId,
+      id,
       firstLine,
       secondLine,
       landMark,
@@ -49,7 +47,7 @@ export default (
     mutation,
     variables,
     updater: (store) => {
-      if (previousApiId === undefined) {
+      if (id === undefined) {
         const connection = store.getRootField("upsertAddress");
         const root = store.getRoot();
         const address = connection.getLinkedRecord("address");

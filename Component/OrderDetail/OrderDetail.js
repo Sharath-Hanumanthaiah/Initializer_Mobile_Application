@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   Image,
+  TouchableOpacity,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  RefreshControl,
 } from "react-native";
 import {
   Button,
@@ -15,44 +20,89 @@ import {
 
 import Timeline from "react-native-timeline-flatlist";
 import CommentModel from "../Items/ItemDetail/CommentModel";
-import {HomePageLoader} from '../Extras/Loaders';
+import { HomePageLoader } from "../Extras/Loaders";
 
 import RelayEnvironment from "../../GraphQLUtils/RelayEnvironment";
 import { QueryRenderer, graphql } from "react-relay";
+import { useQueryLoader, fetchQuery } from "react-relay/hooks";
+import { Currency } from "../Extras/Constants";
+import { ArrowRight, ArrowUp } from "../Extras/Icons";
+import GetCurrentOrderStatus from "../Extras/OrderStatus";
+import { AppColor } from "../Extras/Colors";
+import * as OrderDetailAppQuery from "./__generated__/OrderDetailAppQuery.graphql";
 
-
-const generateTimelineData = (data) => {
-  return [
-    {
-      title: "Confirmed",
-      description: " ",
-      lineColor: data.confirmed ? "#388e3c" : "#808080",
-      circleColor: data.confirmed ? "#388e3c" : "#808080",
-    },
-    {
-      title: "Delivered",
-      description: " ",
-      lineColor: data.delivered ? "#388e3c" : "#808080",
-      circleColor: data.delivered ? "#388e3c" : "#808080",
-    },
-  ];
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+const paymentMode = {
+  M: "COD(Cash on Delivery)",
+  C: "Card",
+  U: "UPI",
 };
-export default function OrderDetail({ route }, props) {
-  // const [product, setProduct] = useState(data);
-  const { orderId } = route.params;
-  const [ModelVisible, setModelVisible] = React.useState(false);
 
-  const openCommentModel = () => {
+const generateTimelineData = (data, paymentMode) => {
+  var lastPendingStatus = false;
+  var keys = Object.keys(data);
+  if (paymentMode === "M") {
+    keys = keys.filter((key) => key !== "payment");
+  }
+  return keys.map((key) => {
+    var circleColor;
+    if (key === "payment") {
+      if (data[key] !== "S") {
+        lastPendingStatus = true;
+      }
+      return {
+        title: key,
+        description: " ",
+        lineColor: data[key] === "S" ? AppColor.Green : AppColor.Grey,
+        circleColor: data[key] === "S" ? AppColor.Green : AppColor.Warning,
+      };
+    }
+    if (data[key]) {
+      circleColor = AppColor.Green;
+    } else {
+      if (!lastPendingStatus) {
+        circleColor = AppColor.Warning;
+        lastPendingStatus = true;
+      } else {
+        circleColor = AppColor.Grey;
+      }
+    }
+    return {
+      title: key,
+      description: " ",
+      lineColor: data[key] ? AppColor.Green : AppColor.Grey,
+      circleColor: circleColor,
+    };
+  });
+};
+export default function OrderDetail({ route, navigation }, props) {
+  const { orderId, userId } = route.params;
+  const [ModelVisible, setModelVisible] = useState(false);
+  const [timelineVisible, setTimelineVisible] = useState(false);
+  const [amountDetailsVisible, setAmountDetailsVisible] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [itemId, setItemId] = React.useState();
+  const [queryRef, loadQuery] = useQueryLoader(OrderDetailAppQuery);
+  const openCommentModel = (itemId) => {
+    setItemId(itemId);
     setModelVisible(true);
   };
   const renderHeader = (info) => {
+    const orderStatus = GetCurrentOrderStatus(info.status, info.paymentMode);
+    console.log("info status", info.status);
+    // const orderStatus = {text: "", status: ""}
     return (
       <Layout style={styles.header}>
         <Layout style={styles.detailsContainer} level="1">
           <Text category="h6" style={styles.title}>
             {"Delivery Address"}
           </Text>
-          <View style={styles.marginVertical_8}>
+          <View style={{ ...styles.marginVertical_8 }}>
             <View style={{ display: "flex", flexDirection: "column" }}>
               <Text category="s1" style={styles.secondHeadingBold}>
                 {info.addressDetails.name}
@@ -86,100 +136,154 @@ export default function OrderDetail({ route }, props) {
 
           {/* date */}
           <View style={styles.marginVertical_8}>
-            <View style={styles.flexRowBetween}>
-              <Text category="s1" style={{ fontWeight: "bold" }}>
+            <View style={styles.rowSpaceBetween}>
+              <Text category="h6" style={styles.title}>
                 {"Ordered On :"}
               </Text>
-              <Text category="s1" style={{ fontWeight: "bold" }}>
+              <Text category="c2" status="basic" style={styles.overflowTitle}>
                 {new Date(info.orderAt).toDateString()}
               </Text>
             </View>
-            <View style={styles.flexRowBetween}>
-              <Text category="s1" style={{ fontWeight: "bold" }}>
+            <View style={styles.rowSpaceBetween}>
+              <Text category="h6" style={styles.title}>
                 {"Delivered By :"}
               </Text>
-              <Text category="s1" style={{ fontWeight: "bold" }}>
+              <Text category="c2" status="basic" style={styles.overflowTitle}>
                 {new Date(info.deliveredBy).toDateString()}
               </Text>
             </View>
           </View>
 
-          <Text category="h6" style={styles.title}>
-            {"Payment Details"}
-          </Text>
-          <View style={styles.marginVertical_8}>
-            <View style={styles.flexRowBetween}>
-              <Text
-                category="s1"
-                appearance="hint"
-                style={styles.secondHeading}
-              >
-                {"Net Price"}
-              </Text>
-              <Text category="s1" style={styles.secondHeading}>
-                {"₹ "} {info.netAmount !== null ? info.netAmount : "0.0"}
-              </Text>
-            </View>
-            <View style={styles.flexRowBetween}>
-              <Text
-                category="s1"
-                appearance="hint"
-                style={styles.secondHeading}
-              >
-                {"Delivery Charge"}
-              </Text>
-              <Text category="s1" style={styles.secondHeading}>
-                {"+ ₹ "} {info.deliveryCharge !== null ? info.deliveryCharge : "0.0"}
-              </Text>
-            </View>
-            <View style={styles.flexRowBetween}>
-              <Text
-                category="s1"
-                appearance="hint"
-                style={styles.secondHeading}
-              >
-                {"Coupen Discount"}
-              </Text>
-              <Text category="s1" style={styles.secondHeading}>
-                {"- ₹ " } {info.coupenDiscount !== null ? info.coupenDiscount : "0.0"}
-              </Text>
-            </View>
-            <Divider style={{ margin: 4 }} />
-            <View style={styles.flexRowBetween}>
-              <Text category="s1" style={styles.secondHeading}>
-                {"Total Amount"}
-              </Text>
-              <Text category="s1" style={styles.secondHeading}>
-                {"₹ "} {info.totalAmount !== null ? info.totalAmount : "0.0"}
-              </Text>
-            </View>
-
-            <View style={[styles.flexRowBetween, { marginTop: 8 }]}>
-              <Text category="s1">{"Payment Type"}</Text>
-              <Text category="s1">{"COD"}</Text>
-            </View>
-          </View>
-
-          <Text category="h6" style={styles.title}>
-            {"Order Status"}
-          </Text>
-          <Timeline
-            timeStyle={{ textAlign: "center", width: 60 }}
-            style={{
-              width: "100%",
-              marginHorizontal: -20,
-              marginTop: 8,
-              marginBottom: -16,
-            }}
-            titleStyle={{ marginTop: -12 }}
-            innerCircle={"dot"}
-            data={generateTimelineData(info.status)}
-          />
-          <View style={{ display: "flex", flexDirection: "row" }}>
+          {/* Payment Mode */}
+          <View style={[styles.rowSpaceBetween]}>
             <Text category="h6" style={styles.title}>
-              {"Item Details"}
+              {"Payment Type"}
+            </Text>
+            <Text category="c2" status="basic" style={styles.overflowTitle}>
+              {paymentMode[info.paymentMode]}
             </Text>
           </View>
+
+          {/* Total Amount */}
+          <View style={styles.rowSpaceBetween}>
+            <Text category="h6" style={styles.title}>
+              {"Total Amount"}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                LayoutAnimation.configureNext(
+                  LayoutAnimation.Presets.easeInEaseOut
+                );
+                setAmountDetailsVisible(!amountDetailsVisible);
+              }}
+            >
+              <View style={styles.rowSpaceBetween}>
+                <Text
+                  category="c2"
+                  status="basic"
+                  style={styles.overflowTitleAmount}
+                >
+                  {`${Currency} ${
+                    info.totalAmount !== null ? info.totalAmount : "0.0"
+                  }`}
+                </Text>
+                {amountDetailsVisible ? (
+                  <ArrowUp style={styles.marginVertical_8} />
+                ) : (
+                  <ArrowRight style={styles.marginVertical_8} />
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
+          {amountDetailsVisible && (
+            <View style={{ display: "flex" }}>
+              <View style={styles.rowSpaceEvenly}>
+                <Text
+                  category="s1"
+                  appearance="hint"
+                  style={styles.secondHeading}
+                >
+                  {"Net Price"}
+                </Text>
+                <Text category="s1" style={styles.secondHeading}>
+                  {`${Currency} `}{" "}
+                  {info.netAmount !== null ? info.netAmount : "0.0"}
+                </Text>
+              </View>
+              <View style={styles.rowSpaceEvenly}>
+                <Text
+                  category="s1"
+                  appearance="hint"
+                  style={styles.secondHeading}
+                >
+                  {"Delivery Charge"}
+                </Text>
+                <Text category="s1" style={styles.secondHeading}>
+                  {`+ ${Currency} `}{" "}
+                  {info.deliveryCharge !== null ? info.deliveryCharge : "0.0"}
+                </Text>
+              </View>
+              <View style={styles.rowSpaceEvenly}>
+                <Text
+                  category="s1"
+                  appearance="hint"
+                  style={styles.secondHeading}
+                >
+                  {"Coupen Discount"}
+                </Text>
+                <Text category="s1" style={styles.secondHeading}>
+                  {`- ${Currency} `}{" "}
+                  {info.coupenDiscount !== null ? info.coupenDiscount : "0.0"}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Order Status */}
+          <View style={styles.rowSpaceBetween}>
+            <Text category="h6" style={styles.title}>
+              {"Status"}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                LayoutAnimation.configureNext(
+                  LayoutAnimation.Presets.easeInEaseOut
+                );
+                setTimelineVisible(!timelineVisible);
+              }}
+            >
+              <View style={styles.rowSpaceBetween}>
+                <Text
+                  category="c2"
+                  // status={orderStatus.status}
+                  style={{ color: orderStatus.status, ...styles.objectStatus }}
+                >
+                  {orderStatus.text}
+                </Text>
+                {timelineVisible ? (
+                  <ArrowUp style={styles.marginVertical_8} />
+                ) : (
+                  <ArrowRight style={styles.marginVertical_8} />
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
+          {timelineVisible && (
+            <View>
+              <Timeline
+                timeStyle={{ textAlign: "center", width: 60 }}
+                style={{
+                  width: "100%",
+                  marginHorizontal: -20,
+                  marginTop: 8,
+                  marginBottom: -16,
+                }}
+                titleStyle={{ marginTop: -12 }}
+                // innerCircle={"dot"}
+                data={generateTimelineData(info.status, info.paymentMode)}
+              />
+            </View>
+          )}
         </Layout>
       </Layout>
     );
@@ -192,6 +296,7 @@ export default function OrderDetail({ route }, props) {
           style={{
             alignItems: "flex-start",
             flexDirection: "row",
+            // width: '100%',
             marginHorizontal: -8,
             height: 70,
           }}
@@ -222,9 +327,9 @@ export default function OrderDetail({ route }, props) {
                 size="small"
                 activeOpacity={0.8}
                 style={styles.ratingButton}
-                onPress={openCommentModel}
+                onPress={() => openCommentModel(info.item.itemId)}
               >
-                Rate Product
+                Rate Item
               </Button>
             </View>
             <View
@@ -235,20 +340,36 @@ export default function OrderDetail({ route }, props) {
               }}
             >
               <Text category="s1">
-                {info.item.quantity + " X " + info.item.unit}
+                {info.item.quantity + " × " + info.item.unit}
               </Text>
-              <Text category="s1">{"₹ " + info.item.amount}</Text>
+              <Text category="s1">{`${Currency} ` + info.item.amount}</Text>
             </View>
           </View>
         </View>
       </Card>
     );
   };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchQuery(RelayEnvironment, OrderDetailAppQuery, {
+      orderId: orderId,
+    }).subscribe({
+      complete: () => {
+        setRefreshing(false);
+      },
+      error: (error) => {
+        let e = error;
+        console.log(error);
+        setRefreshing(false);
+      },
+    });
+  });
+
   return (
     <QueryRenderer
       environment={RelayEnvironment}
       query={graphql`
-        query OrderDetailAppQuery($orderId: ID!) {
+        query OrderDetailAppQuery($orderId: String!) {
           getUserOrderById(orderId: $orderId) {
             id
             orderAt
@@ -257,6 +378,7 @@ export default function OrderDetail({ route }, props) {
             deliveryCharge
             coupenDiscount
             totalAmount
+            paymentMode
             orderList {
               itemId
               itemName
@@ -275,6 +397,7 @@ export default function OrderDetail({ route }, props) {
               pinCode
             }
             status {
+              payment
               confirmed
               delivered
             }
@@ -302,12 +425,19 @@ export default function OrderDetail({ route }, props) {
               <List
                 ListHeaderComponent={renderHeader(props.getUserOrderById)}
                 renderItem={renderItem}
-                // data={props.comments}
                 data={props.getUserOrderById.orderList}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
               />
               <CommentModel
                 ModelVisible={ModelVisible}
                 setModelVisible={setModelVisible}
+                userId={userId}
+                itemId={itemId}
               />
             </View>
           </>
@@ -322,55 +452,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
   title: {
     fontWeight: "bold",
-    width: "90%",
     marginVertical: 8,
   },
-  buttonGroupTextStyle: {
-    fontSize: 13,
-    color: "#8c8c8c",
-  },
-  buttonGroupSelectedTextStyle: {
-    fontSize: 13,
-    color: "#f77a55",
-  },
-  buttonGroupButtonStyle: {
-    width: 60,
-    borderRadius: 10,
-  },
-  buttonGroupButtonContainerStyle: {
-    alignItems: "center",
-  },
-  buttonGroupSelectedButtonStyle: {
-    backgroundColor: "#fff",
-    borderColor: "#f77a55",
-    borderWidth: 1,
-    padding: 6,
-    borderRadius: 10,
-  },
-  backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   ratingButton: {
-    // marginTop: 10,
-    // marginHorizontal: 5,
     height: 10,
     borderColor: "tomato",
     backgroundColor: "tomato",
-  },
-  rating: {
-    marginVertical: 8,
-  },
-  // container: {
-  //   flex: 1,
-  //   backgroundColor: "#bfbfbf",
-  //   //   backgroundColor: 'background-basic-color-2',
-  // },
-  commentList: {
-    flex: 1,
-    //   backgroundColor: 'transparent',
   },
   header: {
     marginBottom: 8,
@@ -384,20 +473,6 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  subtitle: {
-    marginTop: 4,
-  },
-  wishlistButton: {
-    position: "absolute",
-    top: 74,
-    right: 12,
-  },
-  description: {
-    marginVertical: 16,
-  },
-  secondHeading: {
-    marginLeft: 12,
-  },
   secondHeadingBold: {
     fontWeight: "bold",
     marginLeft: 12,
@@ -408,161 +483,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
   },
-  flexRowBetween: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
   marginVertical_8: {
     marginVertical: 8,
   },
-  size: {
-    marginBottom: 16,
-  },
-  colorGroup: {
-    flexDirection: "row",
-    marginHorizontal: -8,
-  },
-  colorRadio: {
-    marginHorizontal: 8,
-  },
-  actionContainer: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    margin: 5,
-    marginHorizontal: 10,
-  },
-  actionButton: {
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  sectionLabel: {
-    marginVertical: 8,
-  },
-  commentInputLabel: {
-    fontSize: 16,
-    marginBottom: 8,
-    //   color: 'text-basic-color',
-  },
-  discount: {
-    color: "#388e3c",
-    fontWeight: "bold",
-    marginTop: 16,
-  },
-  commentInput: {
-    marginVertical: 8,
-    width: "100%",
-    height: 100,
-    overflow: "hidden",
-  },
   renderItem: {
     marginBottom: 8,
-  },
-  commentHeader: {
-    flexDirection: "row",
-    padding: 10,
-  },
-  commentAuthorContainer: {
-    flex: 1,
-    marginHorizontal: 16,
-  },
-  commentReactionsContainer: {
-    flexDirection: "row",
-    marginTop: 8,
-    marginHorizontal: -8,
-    marginVertical: -8,
-  },
-  iconButton: {
-    paddingHorizontal: 0,
-  },
-  paginationContainer: {
-    paddingVertical: 8,
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 8,
-  },
-  imageContainer: {
-    flex: 1,
-    marginBottom: -1,
-    backgroundColor: "white",
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  availablityContainer: {
-    flexDirection: "row",
-    height: "auto",
-    flexWrap: "wrap",
-    overflow: "scroll",
-    marginVertical: 16,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
   },
   secondContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
   },
-  amountButton: {
-    borderRadius: 16,
-  },
-  actualPrice: {
-    textAlign: "center",
-    marginLeft: 1,
-    textDecorationLine: "line-through",
-    fontSize: 18,
-  },
-  discountPrice: {
-    textAlign: "center",
-    marginRight: 12,
-    fontWeight: "bold",
-    fontSize: 22,
-  },
-  Price: {
-    marginVertical: 16,
-  },
-  incrementDecrementContainer: {
-    position: "absolute",
-    flexDirection: "row",
-    right: 0,
-    bottom: 6,
-  },
-  iconButton: {
-    paddingHorizontal: 6,
-  },
-  PlusMinusButton: {
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    borderColor: "tomato",
-  },
-  amount: {
-    textAlign: "center",
-    fontSize: 25,
-    width: 50,
-  },
-  ratingContainer: {
+  rowSpaceBetween: {
     display: "flex",
     flexDirection: "row",
-    flexWrap: "wrap",
-    borderRadius: 4,
-    margin: 4,
-    padding: 4,
-    width: 50,
-    backgroundColor: "#388e3c",
-    position: "absolute",
-    top: 24,
-    right: 5,
+    justifyContent: "space-between",
   },
-  ratingContainerComment: {
+  rowSpaceEvenly: {
     display: "flex",
     flexDirection: "row",
-    flexWrap: "wrap",
-    borderRadius: 4,
-    margin: 4,
-    padding: 4,
-    width: 50,
-    backgroundColor: "#388e3c",
+    justifyContent: "space-between",
+    marginHorizontal: 16,
   },
+  overflowTitle: { fontSize: 14, marginVertical: 8 },
+  objectStatus: { fontSize: 18, marginVertical: 8 },
+  overflowTitleAmount: { fontSize: 25, marginVertical: 4 },
 });

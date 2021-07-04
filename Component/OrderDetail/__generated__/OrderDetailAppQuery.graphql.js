@@ -20,10 +20,11 @@ export type OrderDetailAppQueryResponse = {|
     +deliveryCharge: ?number,
     +coupenDiscount: ?number,
     +totalAmount: ?number,
+    +paymentMode: ?string,
     +orderList: ?$ReadOnlyArray<?{|
       +itemId: string,
       +itemName: ?string,
-      +quantity: ?string,
+      +quantity: ?number,
       +amount: ?number,
       +imageLink: ?string,
       +unit: ?string,
@@ -38,6 +39,7 @@ export type OrderDetailAppQueryResponse = {|
       +pinCode: ?string,
     |},
     +status: ?{|
+      +payment: ?string,
       +confirmed: ?boolean,
       +delivered: ?boolean,
     |},
@@ -52,7 +54,7 @@ export type OrderDetailAppQuery = {|
 
 /*
 query OrderDetailAppQuery(
-  $orderId: ID!
+  $orderId: String!
 ) {
   getUserOrderById(orderId: $orderId) {
     id
@@ -62,6 +64,7 @@ query OrderDetailAppQuery(
     deliveryCharge
     coupenDiscount
     totalAmount
+    paymentMode
     orderList {
       itemId
       itemName
@@ -80,6 +83,7 @@ query OrderDetailAppQuery(
       pinCode
     }
     status {
+      payment
       confirmed
       delivered
     }
@@ -158,6 +162,13 @@ v2 = [
         "args": null,
         "kind": "ScalarField",
         "name": "totalAmount",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "paymentMode",
         "storageKey": null
       },
       {
@@ -279,6 +290,13 @@ v2 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
+            "name": "payment",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
             "name": "confirmed",
             "storageKey": null
           },
@@ -314,16 +332,16 @@ return {
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "8242ff6b7488d5f9ae99564e04403fe8",
+    "cacheID": "d316d98a88ff937c2939e9ce40c0273f",
     "id": null,
     "metadata": {},
     "name": "OrderDetailAppQuery",
     "operationKind": "query",
-    "text": "query OrderDetailAppQuery(\n  $orderId: ID!\n) {\n  getUserOrderById(orderId: $orderId) {\n    id\n    orderAt\n    deliveredBy\n    netAmount\n    deliveryCharge\n    coupenDiscount\n    totalAmount\n    orderList {\n      itemId\n      itemName\n      quantity\n      amount\n      imageLink\n      unit\n    }\n    addressDetails {\n      id\n      name\n      phoneNumber\n      firstLine\n      secondLine\n      landMark\n      pinCode\n    }\n    status {\n      confirmed\n      delivered\n    }\n  }\n}\n"
+    "text": "query OrderDetailAppQuery(\n  $orderId: String!\n) {\n  getUserOrderById(orderId: $orderId) {\n    id\n    orderAt\n    deliveredBy\n    netAmount\n    deliveryCharge\n    coupenDiscount\n    totalAmount\n    paymentMode\n    orderList {\n      itemId\n      itemName\n      quantity\n      amount\n      imageLink\n      unit\n    }\n    addressDetails {\n      id\n      name\n      phoneNumber\n      firstLine\n      secondLine\n      landMark\n      pinCode\n    }\n    status {\n      payment\n      confirmed\n      delivered\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '23f4dbfe5e57c72cf45116e7cbdce229';
+(node/*: any*/).hash = '056bacab658573382e06c4804099c4f3';
 
 module.exports = node;

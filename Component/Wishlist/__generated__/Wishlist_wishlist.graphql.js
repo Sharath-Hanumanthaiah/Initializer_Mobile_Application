@@ -69,13 +69,7 @@ const node/*: ReaderFragment*/ = {
   "selections": [
     {
       "alias": "getUserWishList",
-      "args": [
-        {
-          "kind": "Variable",
-          "name": "userId",
-          "variableName": "userId"
-        }
-      ],
+      "args": null,
       "concreteType": "ItemDetailsConnection",
       "kind": "LinkedField",
       "name": "__Wishlist_getUserWishList_connection",
@@ -162,6 +156,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = 'a95119d182557c162a08eb8dd875e4d3';
+(node/*: any*/).hash = '25c3d81fe5922a74c39b6b4ba3d8b97b';
 
 module.exports = node;

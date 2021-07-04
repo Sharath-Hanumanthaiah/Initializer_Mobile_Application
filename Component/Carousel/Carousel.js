@@ -1,18 +1,30 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import {
+  StyleSheet,
+  useWindowDimensions,
+  PixelRatio,
+} from "react-native";
 import { View, ScrollView, Text } from "react-native";
 import SingleCard from "./SingleCard";
 import ImageCard from "./ImageCard";
+import { Dimensions } from "react-native";
 
 export default function Carousel(props) {
-  const { onItemPress, itemType } = props;
+  const { onItemPress, itemType, item } = props;
   const itemsPerInterval =
     props.itemsPerInterval === undefined ? 1 : props.itemsPerInterval;
 
   const [interval, setInterval] = React.useState(1);
   const [intervals, setIntervals] = React.useState(1);
-  const [width, setWidth] = React.useState(0);
+  const [width, setWidth] = React.useState(1236);
+  const windowWidth = useWindowDimensions().width;
   const init = (width) => {
+    // console.log(
+    //   width,
+    //   windowWidth,
+    //   Dimensions.get('screen').width,
+    //   PixelRatio.getPixelSizeForLayoutSize(windowWidth)
+    // );
     setWidth(width);
     const totalItems = props.item.length;
     setIntervals(Math.ceil(totalItems / itemsPerInterval));
@@ -29,13 +41,15 @@ export default function Carousel(props) {
     }
   };
   let bullets = [];
+
   for (let i = 1; i <= intervals; i++) {
     bullets.push(
       <Text
         key={i}
         style={{
           ...styles.bullet,
-          opacity: interval === i ? 1 : 0.3,
+          color: props.style === "ImageCard" ? "black" : "white",
+          opacity: interval === i ? 1 : 0.4,
         }}
       >
         &bull;
@@ -48,7 +62,7 @@ export default function Carousel(props) {
         horizontal={true}
         contentContainerStyle={{
           ...styles.scrollView,
-          width: `${100 * intervals}%`,
+          width: `${100 * item.length}%`,
         }}
         showsHorizontalScrollIndicator={false}
         onContentSizeChange={(w, h) => init(w)}
@@ -85,19 +99,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   container: {
-    // width: '100%',
-    // height: 50,
     backgroundColor: "#fbfbfb",
     borderColor: "#ebebeb",
-    // borderWidth: 1,
     borderRadius: 10,
-    // shadowColor: '#fcfcfc',
-    // shadowOpacity: 1,
-    // marginTop: 10,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 5
-    // },
   },
   scrollView: {
     display: "flex",
@@ -106,18 +110,13 @@ const styles = StyleSheet.create({
   },
   bullets: {
     position: "absolute",
-    top: 0,
-    bottom: 0,
-    right: 0,
-    display: "flex",
-    justifyContent: "flex-start",
+    bottom: -5,
+    alignSelf: "center",
     flexDirection: "row",
-    paddingHorizontal: 10,
-    paddingTop: 5,
   },
   bullet: {
     paddingHorizontal: 5,
-    fontSize: 25,
+    fontSize: 45,
     fontWeight: "bold",
   },
   card: {

@@ -65,7 +65,6 @@ module.exports = createFragmentContainer(RenderCard, {
       typeId
       content {
         id
-        previousApiId
         name
         offer
         imageLink 

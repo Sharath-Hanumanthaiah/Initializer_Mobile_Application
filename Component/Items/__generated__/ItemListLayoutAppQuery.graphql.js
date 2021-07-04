@@ -16,6 +16,7 @@ export type ItemListLayoutAppQueryVariables = {|
   count: number,
   after?: ?string,
   categoryId?: ?string,
+  userId: string,
 |};
 export type ItemListLayoutAppQueryResponse = {|
   +$fragmentRefs: ItemList_items$ref & ItemSubCategory_subCategory$ref
@@ -30,10 +31,11 @@ export type ItemListLayoutAppQuery = {|
 /*
 query ItemListLayoutAppQuery(
   $itemType: String!
-  $typeId: ID!
+  $typeId: String!
   $count: Int!
   $after: String
-  $categoryId: ID
+  $categoryId: String
+  $userId: String!
 ) {
   ...ItemList_items
   ...ItemSubCategory_subCategory
@@ -41,7 +43,6 @@ query ItemListLayoutAppQuery(
 
 fragment ItemListItem_item on ItemDetails {
   id
-  previousApiId
   name
   imageLink
   isWishlist
@@ -51,12 +52,11 @@ fragment ItemListItem_item on ItemDetails {
     discountPrice
     value
     unit
-    id
   }
 }
 
 fragment ItemList_items on Query {
-  getItemDetails(first: $count, after: $after, itemType: $itemType, typeId: $typeId) {
+  getItemDetails(first: $count, after: $after, itemType: $itemType, typeId: $typeId, userId: $userId) {
     edges {
       cursor
       node {
@@ -78,7 +78,6 @@ fragment ItemSubCategory_subCategory on Query {
       cursor
       node {
         id
-        previousApiId
         name
         offer
         imageLink
@@ -120,18 +119,23 @@ v4 = {
   "name": "typeId"
 },
 v5 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "userId"
+},
+v6 = {
   "kind": "Variable",
   "name": "after",
   "variableName": "after"
 },
-v6 = {
+v7 = {
   "kind": "Variable",
   "name": "first",
   "variableName": "count"
 },
-v7 = [
-  (v5/*: any*/),
+v8 = [
   (v6/*: any*/),
+  (v7/*: any*/),
   {
     "kind": "Variable",
     "name": "itemType",
@@ -141,27 +145,25 @@ v7 = [
     "kind": "Variable",
     "name": "typeId",
     "variableName": "typeId"
+  },
+  {
+    "kind": "Variable",
+    "name": "userId",
+    "variableName": "userId"
   }
 ],
-v8 = {
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v9 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
 v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "previousApiId",
+  "name": "id",
   "storageKey": null
 },
 v11 = {
@@ -211,13 +213,13 @@ v14 = {
   "storageKey": null
 },
 v15 = [
-  (v5/*: any*/),
+  (v6/*: any*/),
   {
     "kind": "Variable",
     "name": "categoryId",
     "variableName": "categoryId"
   },
-  (v6/*: any*/)
+  (v7/*: any*/)
 ];
 return {
   "fragment": {
@@ -226,7 +228,8 @@ return {
       (v1/*: any*/),
       (v2/*: any*/),
       (v3/*: any*/),
-      (v4/*: any*/)
+      (v4/*: any*/),
+      (v5/*: any*/)
     ],
     "kind": "Fragment",
     "metadata": null,
@@ -253,14 +256,15 @@ return {
       (v4/*: any*/),
       (v2/*: any*/),
       (v0/*: any*/),
-      (v1/*: any*/)
+      (v1/*: any*/),
+      (v5/*: any*/)
     ],
     "kind": "Operation",
     "name": "ItemListLayoutAppQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v7/*: any*/),
+        "args": (v8/*: any*/),
         "concreteType": "ItemDetailsConnection",
         "kind": "LinkedField",
         "name": "getItemDetails",
@@ -274,7 +278,7 @@ return {
             "name": "edges",
             "plural": true,
             "selections": [
-              (v8/*: any*/),
+              (v9/*: any*/),
               {
                 "alias": null,
                 "args": null,
@@ -283,7 +287,6 @@ return {
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  (v9/*: any*/),
                   (v10/*: any*/),
                   (v11/*: any*/),
                   (v12/*: any*/),
@@ -336,8 +339,7 @@ return {
                         "kind": "ScalarField",
                         "name": "unit",
                         "storageKey": null
-                      },
-                      (v9/*: any*/)
+                      }
                     ],
                     "storageKey": null
                   },
@@ -354,10 +356,11 @@ return {
       },
       {
         "alias": null,
-        "args": (v7/*: any*/),
+        "args": (v8/*: any*/),
         "filters": [
           "itemType",
-          "typeId"
+          "typeId",
+          "userId"
         ],
         "handle": "connection",
         "key": "ItemList_getItemDetails",
@@ -380,7 +383,7 @@ return {
             "name": "edges",
             "plural": true,
             "selections": [
-              (v8/*: any*/),
+              (v9/*: any*/),
               {
                 "alias": null,
                 "args": null,
@@ -389,7 +392,6 @@ return {
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  (v9/*: any*/),
                   (v10/*: any*/),
                   (v11/*: any*/),
                   {
@@ -425,16 +427,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "203235534bd06c73985a8bbcc669f59f",
+    "cacheID": "456e94d6433e9cd4eaf3e43b3924406d",
     "id": null,
     "metadata": {},
     "name": "ItemListLayoutAppQuery",
     "operationKind": "query",
-    "text": "query ItemListLayoutAppQuery(\n  $itemType: String!\n  $typeId: ID!\n  $count: Int!\n  $after: String\n  $categoryId: ID\n) {\n  ...ItemList_items\n  ...ItemSubCategory_subCategory\n}\n\nfragment ItemListItem_item on ItemDetails {\n  id\n  previousApiId\n  name\n  imageLink\n  isWishlist\n  itemAvailability {\n    actualPrice\n    discount\n    discountPrice\n    value\n    unit\n    id\n  }\n}\n\nfragment ItemList_items on Query {\n  getItemDetails(first: $count, after: $after, itemType: $itemType, typeId: $typeId) {\n    edges {\n      cursor\n      node {\n        id\n        ...ItemListItem_item\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment ItemSubCategory_subCategory on Query {\n  getItemSubCategoryByCategoryId(first: $count, after: $after, categoryId: $categoryId) {\n    edges {\n      cursor\n      node {\n        id\n        previousApiId\n        name\n        offer\n        imageLink\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query ItemListLayoutAppQuery(\n  $itemType: String!\n  $typeId: String!\n  $count: Int!\n  $after: String\n  $categoryId: String\n  $userId: String!\n) {\n  ...ItemList_items\n  ...ItemSubCategory_subCategory\n}\n\nfragment ItemListItem_item on ItemDetails {\n  id\n  name\n  imageLink\n  isWishlist\n  itemAvailability {\n    actualPrice\n    discount\n    discountPrice\n    value\n    unit\n  }\n}\n\nfragment ItemList_items on Query {\n  getItemDetails(first: $count, after: $after, itemType: $itemType, typeId: $typeId, userId: $userId) {\n    edges {\n      cursor\n      node {\n        id\n        ...ItemListItem_item\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment ItemSubCategory_subCategory on Query {\n  getItemSubCategoryByCategoryId(first: $count, after: $after, categoryId: $categoryId) {\n    edges {\n      cursor\n      node {\n        id\n        name\n        offer\n        imageLink\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '89dc15b1cf6df395abdabc3887cc07b5';
+(node/*: any*/).hash = '0c4df39327c8bc40e5e8c0fd3e3fc96a';
 
 module.exports = node;

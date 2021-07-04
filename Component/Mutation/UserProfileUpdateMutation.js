@@ -7,24 +7,21 @@ const mutation = graphql`
     updateUser(input: $input) {
       userDetails {
         id
-        previousApiId
         firstName
         lastName
-        email
       }
     }
   }
 `;
 
 // 3
-export default (previousApiId, firstName, lastName, email, callback) => {
+export default (id, firstName, lastName, callback) => {
   // 4
   const variables = {
     input: {
-      previousApiId,
+      id,
       firstName,
-      lastName,
-      email,
+      lastName
     },
   };
   commitMutation(RelayEnvironment, {

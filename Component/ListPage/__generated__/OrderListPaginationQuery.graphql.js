@@ -8,40 +8,45 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type Feeds_feed$ref = any;
-export type FeedsListQueryVariables = {|
-  count: number,
+type OrderList_orders$ref = any;
+export type OrderListPaginationQueryVariables = {|
   after?: ?string,
+  count?: ?number,
+  userId: string,
 |};
-export type FeedsListQueryResponse = {|
-  +$fragmentRefs: Feeds_feed$ref
+export type OrderListPaginationQueryResponse = {|
+  +$fragmentRefs: OrderList_orders$ref
 |};
-export type FeedsListQuery = {|
-  variables: FeedsListQueryVariables,
-  response: FeedsListQueryResponse,
+export type OrderListPaginationQuery = {|
+  variables: OrderListPaginationQueryVariables,
+  response: OrderListPaginationQueryResponse,
 |};
 */
 
 
 /*
-query FeedsListQuery(
-  $count: Int!
+query OrderListPaginationQuery(
   $after: String
+  $count: Int
+  $userId: String!
 ) {
-  ...Feeds_feed
+  ...OrderList_orders
 }
 
-fragment Feeds_feed on Query {
-  getHomePage(first: $count, after: $after) {
+fragment OrderList_orders on Query {
+  getUserOrderSet(first: $count, after: $after, userId: $userId) {
     edges {
       node {
         id
-        itemType
-        name
-        previousApiId
-        typeId
-        widget
-        ...RenderCard_item
+        deliveredBy
+        orderDetails
+        totalAmount
+        paymentMode
+        status {
+          payment
+          confirmed
+          delivered
+        }
         __typename
       }
       cursor
@@ -52,34 +57,27 @@ fragment Feeds_feed on Query {
     }
   }
 }
-
-fragment RenderCard_item on HomePage {
-  name
-  widget
-  itemType
-  typeId
-  content {
-    id
-    previousApiId
-    name
-    offer
-    imageLink
-  }
-}
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
-  "defaultValue": null,
-  "kind": "LocalArgument",
-  "name": "after"
-},
-v1 = {
-  "defaultValue": null,
-  "kind": "LocalArgument",
-  "name": "count"
-},
-v2 = [
+var v0 = [
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "after"
+  },
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "count"
+  },
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "userId"
+  }
+],
+v1 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -89,43 +87,24 @@ v2 = [
     "kind": "Variable",
     "name": "first",
     "variableName": "count"
+  },
+  {
+    "kind": "Variable",
+    "name": "userId",
+    "variableName": "userId"
   }
-],
-v3 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-},
-v4 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "name",
-  "storageKey": null
-},
-v5 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "previousApiId",
-  "storageKey": null
-};
+];
 return {
   "fragment": {
-    "argumentDefinitions": [
-      (v0/*: any*/),
-      (v1/*: any*/)
-    ],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "FeedsListQuery",
+    "name": "OrderListPaginationQuery",
     "selections": [
       {
         "args": null,
         "kind": "FragmentSpread",
-        "name": "Feeds_feed"
+        "name": "OrderList_orders"
       }
     ],
     "type": "Query",
@@ -133,25 +112,22 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": [
-      (v1/*: any*/),
-      (v0/*: any*/)
-    ],
+    "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
-    "name": "FeedsListQuery",
+    "name": "OrderListPaginationQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v2/*: any*/),
-        "concreteType": "HomePageConnection",
+        "args": (v1/*: any*/),
+        "concreteType": "UserOrderSetConnection",
         "kind": "LinkedField",
-        "name": "getHomePage",
+        "name": "getUserOrderSet",
         "plural": false,
         "selections": [
           {
             "alias": null,
             "args": null,
-            "concreteType": "HomePageConnectionEdge",
+            "concreteType": "UserOrderSetConnectionEdge",
             "kind": "LinkedField",
             "name": "edges",
             "plural": true,
@@ -159,58 +135,73 @@ return {
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "HomePage",
+                "concreteType": "UserOrderSet",
                 "kind": "LinkedField",
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  (v3/*: any*/),
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "itemType",
-                    "storageKey": null
-                  },
-                  (v4/*: any*/),
-                  (v5/*: any*/),
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "typeId",
+                    "name": "id",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "widget",
+                    "name": "deliveredBy",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "HomePageContent",
+                    "kind": "ScalarField",
+                    "name": "orderDetails",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "totalAmount",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "paymentMode",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "OrderStatus",
                     "kind": "LinkedField",
-                    "name": "content",
-                    "plural": true,
+                    "name": "status",
+                    "plural": false,
                     "selections": [
-                      (v3/*: any*/),
-                      (v5/*: any*/),
-                      (v4/*: any*/),
                       {
                         "alias": null,
                         "args": null,
                         "kind": "ScalarField",
-                        "name": "offer",
+                        "name": "payment",
                         "storageKey": null
                       },
                       {
                         "alias": null,
                         "args": null,
                         "kind": "ScalarField",
-                        "name": "imageLink",
+                        "name": "confirmed",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "delivered",
                         "storageKey": null
                       }
                     ],
@@ -266,26 +257,26 @@ return {
       },
       {
         "alias": null,
-        "args": (v2/*: any*/),
-        "filters": null,
+        "args": (v1/*: any*/),
+        "filters": [],
         "handle": "connection",
-        "key": "Feed_getHomePage",
+        "key": "OrderList_getUserOrderSet",
         "kind": "LinkedHandle",
-        "name": "getHomePage"
+        "name": "getUserOrderSet"
       }
     ]
   },
   "params": {
-    "cacheID": "176e08c2503e12fc3b90eac3d8d8e69c",
+    "cacheID": "717c019f83ca33f69da1affb43b3f9d2",
     "id": null,
     "metadata": {},
-    "name": "FeedsListQuery",
+    "name": "OrderListPaginationQuery",
     "operationKind": "query",
-    "text": "query FeedsListQuery(\n  $count: Int!\n  $after: String\n) {\n  ...Feeds_feed\n}\n\nfragment Feeds_feed on Query {\n  getHomePage(first: $count, after: $after) {\n    edges {\n      node {\n        id\n        itemType\n        name\n        previousApiId\n        typeId\n        widget\n        ...RenderCard_item\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment RenderCard_item on HomePage {\n  name\n  widget\n  itemType\n  typeId\n  content {\n    id\n    previousApiId\n    name\n    offer\n    imageLink\n  }\n}\n"
+    "text": "query OrderListPaginationQuery(\n  $after: String\n  $count: Int\n  $userId: String!\n) {\n  ...OrderList_orders\n}\n\nfragment OrderList_orders on Query {\n  getUserOrderSet(first: $count, after: $after, userId: $userId) {\n    edges {\n      node {\n        id\n        deliveredBy\n        orderDetails\n        totalAmount\n        paymentMode\n        status {\n          payment\n          confirmed\n          delivered\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a8aaf291d4679fe8b299ee377d8fa551';
+(node/*: any*/).hash = 'd71446d8f6192dc20577de427ad6c0b7';
 
 module.exports = node;

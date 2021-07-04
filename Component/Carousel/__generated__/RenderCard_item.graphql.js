@@ -18,7 +18,6 @@ export type RenderCard_item = {|
   +typeId: ?string,
   +content: ?$ReadOnlyArray<?{|
     +id: string,
-    +previousApiId: string,
     +name: ?string,
     +offer: ?string,
     +imageLink: ?string,
@@ -85,13 +84,6 @@ return {
           "name": "id",
           "storageKey": null
         },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "previousApiId",
-          "storageKey": null
-        },
         (v0/*: any*/),
         {
           "alias": null,
@@ -116,6 +108,6 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'cbb30f3e3f7f9dafe9341c81d1662327';
+(node/*: any*/).hash = '383fcbcf25a18a195cc74549ee313602';
 
 module.exports = node;

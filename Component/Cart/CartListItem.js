@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Button, ListItem, ListItemProps, Text } from "@ui-kitten/components";
 import { ButtonGroup } from "react-native-elements";
 
 import { createFragmentContainer, graphql } from "react-relay";
 import { AppColor } from "../Extras/Colors";
-import {Cancel} from '../Extras/Icons';
+import { Delete } from "../Extras/Icons";
+import {Currency} from '../Extras/Constants'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { CartActionMini } from "../Items/ItemDetail/CartAction";
-export default function CartListItem(props) {
+import ChangeCart from '../Mutation/UserCartListMutation';
+
+function CartListItem(props) {
   //   const index = props.item.previousApiId;
-  const product = props.item;
+  const cart = props.cart;
   const {
     style,
     onProductChange,
@@ -19,26 +22,47 @@ export default function CartListItem(props) {
     onAddWishList,
     ...listItemProps
   } = props;
-  const [quantity, setQuantity] = useState(1);
-  //   const [availabilityIndex, setAvailabilityIndex] = useState(0);
-  //   const buttons = product.itemAvailability.map((e) => {
-  //     return `${e.value} ${e.unit}`;
-  //   });
-  //   const WishListIconActive = (props) => (
-  //     <MaterialCommunityIcons name="heart" size={23} color="tomato" />
-  //   );
-  //   const WishListIconInactive = (style) => (
-  //     <MaterialCommunityIcons name="heart-outline" size={23} color="tomato" />
-  //   );
-  //   const addToWishList = (props) => {
-  //     onAddWishList(product, index);
-  //   };
-  //   const updateIndex = (selectedIndex) => {
-  //     setAvailabilityIndex(selectedIndex);
-  //   };
+  const onMinusButtonPress = () => {
+    const callback = () => {
+    };
+    ChangeCart(
+      true,
+      cart.itemId,
+      cart.userId,
+      cart.availabilityId,
+      parseInt(cart.quantity, 10) - 1,
+      callback,
+      cart.discountPrice/cart.quantity
+    );
+  };
+  const onPlusButtonPress = () => {
+    const callback = () => {
+    };
+    ChangeCart(
+      true,
+      cart.itemId,
+      cart.userId,
+      cart.availabilityId,
+      parseInt(cart.quantity, 10) + 1,
+      callback,
+      cart.discountPrice/cart.quantity
+    );
+  };
+  const onDeletePress = () => {
+    const callback = () => {
+    };
+    ChangeCart(
+      true,
+      cart.itemId,
+      cart.userId,
+      cart.availabilityId,
+      0,
+      callback
+    );
+  }
   return (
     <ListItem
-      key={product.id}
+      key={cart.id}
       //   onPress={() => onItemPress({ itemType: "ItemDetails", typeId: product.previousApiId })}
       {...listItemProps}
       disabled={true}
@@ -46,62 +70,66 @@ export default function CartListItem(props) {
     >
       <Image
         style={styles.image}
-        // source={{ uri: product.imageLink }}
-        source={product.imageLink}
+        source={{ uri: cart.imageLink }}
       />
       <View style={styles.detailsContainer}>
         <View style={{ width: "90%" }}>
           <Text category="h6" style={{}}>
-            {product.name}
+            {cart.itemName}
           </Text>
         </View>
         <View style={styles.amountContainer}>
-          <View style={{flex:1, flexDirection: 'row'}}>
-            <Text style={styles.availablity, {marginLeft: 38}} category="s1" appearance="hint">
+          {/* <View style={{ flex: 1, flexDirection: "row" }}>
+            <Text
+              style={(styles.availablity, { marginLeft: 38 })}
+              category="s1"
+              appearance="hint"
+            >
               {`Quantity : `}
             </Text>
             <Text style={styles.availablity} category="s1">
-              {`1 KG`}
+              {`${cart.value} ${cart.unit}`}
             </Text>
-          </View>
-          <Text style={styles.discountPrice} category="s1">
-            {`Rs 190`}
+          </View> */}
+          <Text style={styles.availablity} category="s1">
+              {`${cart.value} ${cart.unit}`}
+            </Text>
+          <Text style={styles.discountPrice} category="h6">
+            {`${Currency} ${cart.discountPrice}`}
           </Text>
         </View>
         <View style={{ margin: 10, flex: 1, flexDirection: "row" }}>
-          <CartActionMini quantity={quantity} setQuantity={setQuantity} />
+          <CartActionMini quantity={cart.quantity} onMinusButtonPress={onMinusButtonPress} 
+          onPlusButtonPress={onPlusButtonPress} />
         </View>
       </View>
       <Button
         style={[styles.iconButton, styles.removeButton]}
         appearance="ghost"
         status="basic"
-        accessoryLeft={Cancel}
-        onPress={() => {}}
+        accessoryLeft={Delete}
+        onPress={onDeletePress}
       />
     </ListItem>
   );
 }
 
-// export default createFragmentContainer(ItemListItem, {
-//   item: graphql`
-//     # As a convention, we name the fragment as '<ComponentFileName>_<propName>'
-//     fragment ItemListItem_item on ItemDetails {
-//       id
-//       previousApiId
-//       name
-//       imageLink
-//       isWishlist
-//       itemAvailability {
-//         actualPrice
-//         discount
-//         discountPrice
-//         value
-//         unit
-//       }
-//     }
-//   `,
-// });
+export default createFragmentContainer(CartListItem, {
+  cart: graphql`
+    fragment CartListItem_Cart on UserCartList {
+      id
+      itemId
+      userId
+      availabilityId
+      imageLink
+      quantity
+      itemName
+      unit
+      value
+      discountPrice
+    }
+  `,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -125,8 +153,8 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     flex: 1,
-    flexDirection: "row-reverse",
-    justifyContent: "space-evenly",
+    flexDirection: "row",
+    // justifyContent: "flex-start",
     // marginTop: 6
   },
   amountButton: {
@@ -139,7 +167,7 @@ const styles = StyleSheet.create({
   },
   discountPrice: {
     textAlign: "center",
-    // marginLeft: 10,
+    marginLeft: 40,
     color: AppColor.Green,
     // fontSize: 16,
   },
@@ -157,7 +185,7 @@ const styles = StyleSheet.create({
   removeButton: {
     position: "absolute",
     right: 0,
-    top: 0
+    top: 0,
   },
   iconButton: {
     // paddingHorizontal: 0,

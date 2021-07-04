@@ -50,6 +50,10 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "RootArgument",
       "name": "typeId"
+    },
+    {
+      "kind": "RootArgument",
+      "name": "userId"
     }
   ],
   "kind": "Fragment",
@@ -79,6 +83,11 @@ const node/*: ReaderFragment*/ = {
           "kind": "Variable",
           "name": "typeId",
           "variableName": "typeId"
+        },
+        {
+          "kind": "Variable",
+          "name": "userId",
+          "variableName": "userId"
         }
       ],
       "concreteType": "ItemDetailsConnection",
@@ -167,6 +176,6 @@ const node/*: ReaderFragment*/ = {
   "abstractKey": null
 };
 // prettier-ignore
-(node/*: any*/).hash = 'fa9444e31b8d4ca6760cbdbb6b66b760';
+(node/*: any*/).hash = '9f4c863b138b4b4db86cd762839e2088';
 
 module.exports = node;

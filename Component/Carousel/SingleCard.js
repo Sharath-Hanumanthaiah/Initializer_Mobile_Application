@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { Card, Text } from "@ui-kitten/components";
 import ImageOverlay from "../Extras/ImageOverlay";
 
@@ -12,7 +12,7 @@ export default function SingleCard(props) {
     <Card
       key={props.item.id}
       style={{ ...styles.item, width: width }}
-      onPress={() => onItemPress({itemType: itemType, typeId: props.item.previousApiId})}
+      onPress={() => onItemPress({itemType: itemType, typeId: props.item.id})}
     >
       <ImageOverlay
         style={styles.itemImage}
@@ -23,6 +23,7 @@ export default function SingleCard(props) {
             : require("../../assets/product-default.png")
         }
       >
+        <View style={styles.textContainer}>
         <View style={styles.itemFooter}>
           <Text style={styles.itemTitle} category="h2" status="control">
             {props.item.name}
@@ -46,6 +47,7 @@ export default function SingleCard(props) {
             <></>
           )}
         </View>
+        </View>
       </ImageOverlay>
     </Card>
   );
@@ -61,17 +63,14 @@ const styles = StyleSheet.create({
   },
   item: {
     marginVertical: 8,
-    height: 220,
-    //   width: '33%'
+    height: 220
   },
   itemImage: {
     ...StyleSheet.absoluteFillObject,
-    height: 220,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
+    height: 220
   },
   itemTitle: {
-    zIndex: 1,
+    zIndex: 1
   },
   itemDescription: {
     zIndex: 1,
@@ -87,4 +86,9 @@ const styles = StyleSheet.create({
   iconButton: {
     paddingHorizontal: 0,
   },
+  textContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor:'#00000070',
+  }
 });

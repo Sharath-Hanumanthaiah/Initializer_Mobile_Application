@@ -39,6 +39,8 @@ fragment ItemDetail_comment on Query {
       cursor
       node {
         id
+        itemId
+        userId
         userName
         rating
         review
@@ -143,7 +145,7 @@ return {
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "UserReview",
+                "concreteType": "UserReviewOutput",
                 "kind": "LinkedField",
                 "name": "node",
                 "plural": false,
@@ -153,6 +155,20 @@ return {
                     "args": null,
                     "kind": "ScalarField",
                     "name": "id",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "itemId",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "userId",
                     "storageKey": null
                   },
                   {
@@ -238,12 +254,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "8a47b3db309dfec00a45710f93b06883",
+    "cacheID": "db5d9b2022e9a86b31efa38e5e5fabc8",
     "id": null,
     "metadata": {},
     "name": "ItemDetailQuery",
     "operationKind": "query",
-    "text": "query ItemDetailQuery(\n  $count: Int!\n  $after: String\n  $itemId: ID!\n) {\n  ...ItemDetail_comment\n}\n\nfragment ItemDetail_comment on Query {\n  getItemReview(first: $count, after: $after, itemId: $itemId) {\n    edges {\n      cursor\n      node {\n        id\n        userName\n        rating\n        review\n        changedAt\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query ItemDetailQuery(\n  $count: Int!\n  $after: String\n  $itemId: ID!\n) {\n  ...ItemDetail_comment\n}\n\nfragment ItemDetail_comment on Query {\n  getItemReview(first: $count, after: $after, itemId: $itemId) {\n    edges {\n      cursor\n      node {\n        id\n        itemId\n        userId\n        userName\n        rating\n        review\n        changedAt\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();

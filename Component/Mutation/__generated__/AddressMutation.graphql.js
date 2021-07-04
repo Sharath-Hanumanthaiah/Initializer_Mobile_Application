@@ -10,11 +10,11 @@
 import type { ConcreteRequest } from 'relay-runtime';
 export type AddressInput = {|
   firstLine?: ?string,
+  id?: ?string,
   landMark?: ?string,
   name: string,
   phoneNumber: string,
   pinCode?: ?string,
-  previousApiId?: ?string,
   secondLine?: ?string,
   userId: string,
 |};
@@ -25,7 +25,6 @@ export type AddressMutationResponse = {|
   +upsertAddress: ?{|
     +address: ?{|
       +id: string,
-      +previousApiId: string,
       +name: ?string,
       +phoneNumber: ?string,
       +firstLine: ?string,
@@ -49,7 +48,6 @@ mutation AddressMutation(
   upsertAddress(input: $input) {
     address {
       id
-      previousApiId
       name
       phoneNumber
       firstLine
@@ -97,13 +95,6 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "id",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "previousApiId",
             "storageKey": null
           },
           {
@@ -173,16 +164,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "e76a97fde2174b75e592665c6a5bac38",
+    "cacheID": "5dadcce380f96d286932c4a290e5ca75",
     "id": null,
     "metadata": {},
     "name": "AddressMutation",
     "operationKind": "mutation",
-    "text": "mutation AddressMutation(\n  $input: AddressInput!\n) {\n  upsertAddress(input: $input) {\n    address {\n      id\n      previousApiId\n      name\n      phoneNumber\n      firstLine\n      secondLine\n      landMark\n      pinCode\n    }\n  }\n}\n"
+    "text": "mutation AddressMutation(\n  $input: AddressInput!\n) {\n  upsertAddress(input: $input) {\n    address {\n      id\n      name\n      phoneNumber\n      firstLine\n      secondLine\n      landMark\n      pinCode\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'db671095f02ed69fed163e537080f2ac';
+(node/*: any*/).hash = 'd5ef8d06b718871485ab87a594832fa5';
 
 module.exports = node;

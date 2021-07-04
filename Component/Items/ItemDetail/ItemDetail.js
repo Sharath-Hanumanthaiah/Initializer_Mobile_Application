@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { StyleSheet, View, ToastAndroid } from "react-native";
+import { StyleSheet, View, ToastAndroid, Platform, Alert } from "react-native";
 import { Button, Layout, Card, List, Text } from "@ui-kitten/components";
 
 import RatingViewer from "../../Extras/RatingViewer";
 
-import { ButtonGroup } from "react-native-elements";
-
 import Carousel from "../../Carousel/Carousel";
 
 import { WishListIconActive, WishListIconInactive } from "../../Extras/Icons";
+import { Currency } from "../../Extras/Constants";
 
 import { CartAction } from "./CartAction";
 import CommentModel from "./CommentModel";
-
+import RNPickerSelect from "react-native-picker-select";
 import { createPaginationContainer, graphql } from "react-relay";
+import * as SecureStore from "expo-secure-store";
+
+//Mutation
+import ChangeWishlist from "../../Mutation/UserWishListMutation";
+import ChangeCart from "../../Mutation/UserCartListMutation";
 
 function _loadMore(props) {
   console.log(
@@ -33,45 +37,62 @@ function _loadMore(props) {
   );
 }
 function ItemDetail(props) {
-  const [isWishlist, setIsWishList] = useState(
-    props.item.getItemDetailsById.isWishlist
-  );
+  const [userId, setUserId] = useState("");
+  SecureStore.getItemAsync("userId").then((userId) => setUserId(userId));
   const [quantity, setQuantity] = useState(1);
   const [ModelVisible, setModelVisible] = React.useState(false);
   const availabilityData =
-    props.item.getItemDetailsById.itemAvailability === undefined
+  !props.item.getItemDetailsById || !props.item.getItemDetailsById.itemAvailability
       ? [{}]
       : props.item.getItemDetailsById.itemAvailability;
 
   const [availabilityIndex, setAvailabilityIndex] = useState(0);
 
-  const [comment, setComment] = React.useState("");
-
-  const updateIndex = (selectedIndex) => {
-    setAvailabilityIndex(selectedIndex);
-  };
-
-  const onBuyButtonPress = () => {
-    //   navigation && navigation.navigate('Payment');
-  };
-  const openCommentModel = () => {
-    setModelVisible(true);
-  };
-  const onAddButtonPress = () => {
-    //   navigation && navigation.navigate('ShoppingCart');
+  const onAddToCart = () => {
+    const itemDetails = props.item.getItemDetailsById;
+    const callback = () => {
+      // ToastAndroid.show(
+      //   `added to your cart`,
+      //   ToastAndroid.SHORT,
+      //   ToastAndroid.CENTER
+      // );
+    };
+    ChangeCart(
+      false,
+      itemDetails.id,
+      userId,
+      itemDetails.itemAvailability[availabilityIndex].id,
+      quantity,
+      callback
+    );
   };
   const addToWishList = (props) => {
-    let messageContext = isWishlist ? "removed from" : "added to";
-    setIsWishList(!isWishlist);
-    ToastAndroid.show(
-      `${messageContext} your wishlist`,
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
+    const callback = () => {
+      let messageContext =
+        props.type === "remove" ? "removed from" : "added to";
+      // ToastAndroid.show(
+      //   `${messageContext} your wishlist`,
+      //   ToastAndroid.SHORT,
+      //   ToastAndroid.CENTER
+      // );
+    };
+    ChangeWishlist(
+      props.id,
+      props.userId,
+      props.previousApiId,
+      props.type,
+      callback
     );
   };
   const buttons = availabilityData.map((e) => {
     return `${e.value} ${e.unit}`;
   });
+  const onMinusButtonPress = () => {
+    setQuantity(quantity - 1);
+  };
+  const onPlusButtonPress = () => {
+    setQuantity(quantity + 1);
+  };
   const renderCommentHeader = (comment) => (
     <View style={styles.commentHeader}>
       <View style={styles.commentAuthorContainer}>
@@ -94,7 +115,9 @@ function ItemDetail(props) {
       <Text>{item.node.review}</Text>
     </Card>
   );
-  const renderheader = (info) => (
+  const renderheader = (info) =>  {
+    if(!info) return <></>
+    return (
     <Layout style={styles.header}>
       <Carousel
         style={"ImageCard"}
@@ -121,23 +144,41 @@ function ItemDetail(props) {
         <Text style={styles.secondHeading} category="s1">
           Available In
         </Text>
-        <ButtonGroup
-          onPress={updateIndex}
-          selectedIndex={availabilityIndex}
-          buttons={buttons}
-          containerStyle={styles.availablityContainer}
-          textStyle={styles.buttonGroupTextStyle}
-          selectedTextStyle={styles.buttonGroupSelectedTextStyle}
-          buttonStyle={styles.buttonGroupButtonStyle}
-          buttonContainerStyle={styles.buttonGroupButtonContainerStyle}
-          selectedButtonStyle={styles.buttonGroupSelectedButtonStyle}
-        />
+        <View style={{ alignItems: "center" }}>
+          <RNPickerSelect
+            onValueChange={(value, index) => {
+              setAvailabilityIndex(index);
+            }}
+            style={{
+              inputIOSContainer: { alignSelf: "center" },
+              inputIOS: { fontSize: 16, fontWeight: "bold" },
+            }}
+            placeholder={{}}
+            items={props.item.getItemDetailsById.itemAvailability.map(
+              (value, index) => {
+                return {
+                  label: `${value.value} ${value.unit}`,
+                  value: `${value.value} ${value.unit}`,
+                };
+              }
+            )}
+          />
+        </View>
         <Button
           style={styles.wishlistButton}
           appearance="ghost"
           status="basic"
-          accessoryLeft={isWishlist ? WishListIconActive : WishListIconInactive}
-          onPress={addToWishList}
+          accessoryLeft={
+            info.isWishlist ? WishListIconActive : WishListIconInactive
+          }
+          onPress={() =>
+            addToWishList({
+              id: info.id,
+              userId: userId,
+              previousApiId: info.previousApiId,
+              type: info.isWishlist ? "remove" : "add",
+            })
+          }
         />
         {availabilityData[availabilityIndex] ? (
           <View style={{ marginTop: 8 }}>
@@ -151,7 +192,7 @@ function ItemDetail(props) {
                   category="s1"
                   appearance="hint"
                 >
-                  {`₹ ${availabilityData[availabilityIndex].actualPrice}`}
+                  {`${Currency} ${availabilityData[availabilityIndex].actualPrice}`}
                 </Text>
               </View>
               <View style={styles.secondContainer}>
@@ -159,7 +200,7 @@ function ItemDetail(props) {
                   {"Selling Price : "}
                 </Text>
                 <Text style={styles.discountPrice} category="h6">
-                  {`₹ ${availabilityData[availabilityIndex].discountPrice}`}
+                  {`${Currency} ${availabilityData[availabilityIndex].discountPrice}`}
                 </Text>
               </View>
             </View>
@@ -192,6 +233,7 @@ function ItemDetail(props) {
       </Layout>
     </Layout>
   );
+        }
   return (
     <View style={styles.container}>
       <List
@@ -201,7 +243,12 @@ function ItemDetail(props) {
         onEndReachedThreshold={0.5}
         onEndReached={() => _loadMore(props)}
       />
-      <CartAction quantity={quantity} setQuantity={setQuantity} />
+      <CartAction
+        quantity={quantity}
+        onMinusButtonPress={onMinusButtonPress}
+        onPlusButtonPress={onPlusButtonPress}
+        onAddToCart={onAddToCart}
+      />
       <CommentModel
         ModelVisible={ModelVisible}
         setModelVisible={setModelVisible}
@@ -221,9 +268,11 @@ module.exports = createPaginationContainer(
             cursor
             node {
               id
+              itemId
+              userId
               userName
               rating
-              review
+              review  
               changedAt
             }
           }
@@ -235,7 +284,6 @@ module.exports = createPaginationContainer(
       fragment ItemDetail_item on Query {
         getItemDetailsById(itemId: $itemId, userId: $userId) {
           id
-          previousApiId
           name
           itemAvailability {
             id

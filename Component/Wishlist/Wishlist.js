@@ -5,7 +5,6 @@ import ItemListItem from "../Items/ItemListItem";
 
 import { createPaginationContainer, graphql } from "react-relay";
 import { PaginationLoader } from "../Extras/Loaders";
-
 function _loadMore(props) {
   console.log(
     "starting loading more",
@@ -25,18 +24,7 @@ function _loadMore(props) {
 }
 
 function Wishlist(props) {
-  const { navigation } = props;
-  const showToast = (message) => {
-    ToastAndroid.showWithGravity(
-      message,
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
-    );
-    ToastAndroid.show(message, ToastAndroid.SHORT, ToastAndroid.CENTER);
-  };
-  const onAddWishList = (product, index) => {
-    showToast(`Removed from your wishlist`);
-  };
+  const { navigation, userId } = props;
   const onItemPress = (event) => {
     navigation.navigate("Details", {
       typeId: event.typeId,
@@ -50,8 +38,7 @@ function Wishlist(props) {
           index={item.node.id}
           item={item.node}
           onItemPress={onItemPress}
-          // onProductChange={onItemChange}
-          onAddWishList={onAddWishList}
+          userId={userId}
         />
         <Divider style={styles.divider} />
       </>
@@ -83,7 +70,7 @@ module.exports = createPaginationContainer(
     wishlist: graphql`
       fragment Wishlist_wishlist on Query {
         getUserWishList(first: $count, after: $after, userId: $userId)
-          @connection(key: "Wishlist_getUserWishList") {
+          @connection(key: "Wishlist_getUserWishList", filters: []) {
           edges {
             cursor
             node {
@@ -112,14 +99,11 @@ module.exports = createPaginationContainer(
       };
     },
     getVariables(props, { count, cursor }, fragmentVariables) {
-      console.log("fragmentVariables", fragmentVariables);
       return {
         count: fragmentVariables.count,
         after: props.wishlist.getUserWishList.pageInfo.endCursor,
         userId: fragmentVariables.userId,
-        cursor,
-        // userID isn't specified as an @argument for the fragment, but it should be a variable available for the fragment under the query root.
-        // userID: fragmentVariables.userID,
+        cursor
       };
     },
     query: graphql`

@@ -26,7 +26,7 @@ export type OrderAppQuery = {|
 
 /*
 query OrderAppQuery(
-  $userId: ID!
+  $userId: String!
   $count: Int!
   $after: String
 ) {
@@ -38,10 +38,15 @@ fragment OrderList_orders on Query {
     edges {
       node {
         id
-        previousApiId
         deliveredBy
         orderDetails
         totalAmount
+        paymentMode
+        status {
+          payment
+          confirmed
+          delivered
+        }
         __typename
       }
       cursor
@@ -152,13 +157,6 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "previousApiId",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
                     "name": "deliveredBy",
                     "storageKey": null
                   },
@@ -174,6 +172,45 @@ return {
                     "args": null,
                     "kind": "ScalarField",
                     "name": "totalAmount",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "paymentMode",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "OrderStatus",
+                    "kind": "LinkedField",
+                    "name": "status",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "payment",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "confirmed",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
+                        "name": "delivered",
+                        "storageKey": null
+                      }
+                    ],
                     "storageKey": null
                   },
                   {
@@ -227,9 +264,7 @@ return {
       {
         "alias": null,
         "args": (v3/*: any*/),
-        "filters": [
-          "userId"
-        ],
+        "filters": [],
         "handle": "connection",
         "key": "OrderList_getUserOrderSet",
         "kind": "LinkedHandle",
@@ -238,16 +273,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "351fe2c3591eddde387cdb5b1d68ac48",
+    "cacheID": "3c6d4fe984d4584cb781f19e7c94fcf5",
     "id": null,
     "metadata": {},
     "name": "OrderAppQuery",
     "operationKind": "query",
-    "text": "query OrderAppQuery(\n  $userId: ID!\n  $count: Int!\n  $after: String\n) {\n  ...OrderList_orders\n}\n\nfragment OrderList_orders on Query {\n  getUserOrderSet(first: $count, after: $after, userId: $userId) {\n    edges {\n      node {\n        id\n        previousApiId\n        deliveredBy\n        orderDetails\n        totalAmount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query OrderAppQuery(\n  $userId: String!\n  $count: Int!\n  $after: String\n) {\n  ...OrderList_orders\n}\n\nfragment OrderList_orders on Query {\n  getUserOrderSet(first: $count, after: $after, userId: $userId) {\n    edges {\n      node {\n        id\n        deliveredBy\n        orderDetails\n        totalAmount\n        paymentMode\n        status {\n          payment\n          confirmed\n          delivered\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '6ff7fc72bf9229c4dd71ca04d0804025';
+(node/*: any*/).hash = '99031bb8801ebf2e329b8f1130abe75a';
 
 module.exports = node;

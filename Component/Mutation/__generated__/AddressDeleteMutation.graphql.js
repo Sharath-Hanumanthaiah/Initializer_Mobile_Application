@@ -23,7 +23,7 @@ export type AddressDeleteMutation = {|
 
 /*
 mutation AddressDeleteMutation(
-  $id: ID!
+  $id: String!
 ) {
   deleteAddress(id: $id)
 }
@@ -70,16 +70,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "60ac5af319f8d78d7e748b76816adf49",
+    "cacheID": "0071eabf3bea13c77891b3b27e10f478",
     "id": null,
     "metadata": {},
     "name": "AddressDeleteMutation",
     "operationKind": "mutation",
-    "text": "mutation AddressDeleteMutation(\n  $id: ID!\n) {\n  deleteAddress(id: $id)\n}\n"
+    "text": "mutation AddressDeleteMutation(\n  $id: String!\n) {\n  deleteAddress(id: $id)\n}\n"
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'cc37ece694f38fbea1bcd8ccdde4a769';
+(node/*: any*/).hash = '2e054fc7d7e0d0deea25c9645509f8ef';
 
 module.exports = node;

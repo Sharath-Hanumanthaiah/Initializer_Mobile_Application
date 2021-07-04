@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal, Card, Input } from "@ui-kitten/components";
 import { View, StyleSheet } from "react-native";
-import { Rating } from "react-native-elements";
+import { Rating } from "../../Extras/Rating";
+import CreateReview from '../../Mutation/ReviewMutation';
 
 export default function CommentModel(props) {
-  const { ModelVisible, setModelVisible } = props;
-
+  const { ModelVisible, setModelVisible, userId, itemId } = props;
+  console.log("comment model", userId, itemId);
+  const [rating, setRating] = useState(4);
+  const [review, setReview] = React.useState('');
+  const onSubmitRating = () => {
+    CreateReview(
+      itemId,
+      userId,
+      rating,
+      review,
+      () => {setModelVisible(false)}
+    )
+  }
   return (
     <Modal
       visible={ModelVisible}
@@ -15,21 +27,19 @@ export default function CommentModel(props) {
     >
       <Card disabled={true}>
         <Rating
-          imageSize={30}
-          startingValue={1}
-          fractions={1}
-          style={styles.rating}
+          style={styles.rateBar}
+          value={rating}
+          onValueChange={(e) => setRating(e)}
         />
         <Input
           multiline={true}
-          textStyle={{ minHeight: 88 }}
-          placeholder="Comment..."
+          placeholder="How did you feel about our service?"
           style={styles.commentInput}
-          // {...multilineInputState}
+          onChangeText={nextValue => setReview(nextValue)}
         />
         <View style={styles.buttonContainer}>
           <Button
-            onPress={() => setModelVisible(false)}
+            onPress={onSubmitRating}
             activeOpacity={0.8}
             style={styles.buttonSubmit}
           >
@@ -63,12 +73,17 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     display: "flex",
+    alignSelf: 'center',
     flexDirection: "row",
-    marginVertical: 8,
+    justifyContent: 'space-between'
   },
   buttonSubmit: {
     marginHorizontal: 16,
     backgroundColor: "tomato",
     borderColor: "tomato",
+  },
+  rateBar: {
+    marginHorizontal: 0,
+    alignSelf: "center",
   },
 });
